@@ -2,6 +2,7 @@ plugins {
     id(Dependencies.Plugins.androidApplication)
     id(Dependencies.Plugins.kotlinAndroid)
     id(Dependencies.Plugins.ksp) version Dependencies.Plugins.kspVersion
+    id(Dependencies.Plugins.kotlinParcelize)
 }
 
 android {

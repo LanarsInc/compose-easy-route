@@ -43,17 +43,23 @@ class DeclarationToDestinationMapper(
 
         val serializableType =
             resolver.getClassDeclarationByName("java.io.Serializable")!!.asType(emptyList())
+        val parcelableType =
+            resolver.getClassDeclarationByName("android.os.Parcelable")!!.asType(emptyList())
 
         var isSerializable = serializableType.isAssignableFrom(resolvedType)
+        var isParcelable = parcelableType.isAssignableFrom(resolvedType)
 
         val navType = try {
             val primitiveNavType =
                 NavType.forType(resolvedTypeDeclaration.qualifiedName!!.asString())
             isSerializable = false
+            isParcelable = false
             primitiveNavType
         } catch (e: Exception) {
             if (isSerializable) {
                 NavType.SerializableNavType(resolvedTypeDeclaration.simpleName.asString())
+            } else if (isParcelable) {
+                NavType.ParcelableNavType(resolvedTypeDeclaration.simpleName.asString())
             } else {
                 throw e
             }
@@ -65,7 +71,8 @@ class DeclarationToDestinationMapper(
                 simpleName = resolvedTypeDeclaration.simpleName.asString(),
                 qualifiedName = resolvedTypeDeclaration.qualifiedName!!.asString(),
                 navType = navType,
-                isSerializable = isSerializable
+                isSerializable = isSerializable,
+                isParcelable = isParcelable
             ),
             hasDefault = hasDefault
         )

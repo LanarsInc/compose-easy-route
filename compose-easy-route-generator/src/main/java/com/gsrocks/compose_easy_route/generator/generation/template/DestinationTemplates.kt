@@ -38,6 +38,8 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import ${Constants.BASE_PACKAGE_NAME}.core.model.NavDirection
 import ${Constants.BASE_PACKAGE_NAME}.navtype.SerializableNavType
+import ${Constants.BASE_PACKAGE_NAME}.serializer.ParcelableNavTypeSerializer
+import ${Constants.BASE_PACKAGE_NAME}.navtype.ParcelableNavType
 import ${destination.composableQualifiedName}
 ${destination.parameters.joinToString(separator = "\n") { it.type.getImportString() }}
 
@@ -54,8 +56,7 @@ object ${destination.composableName}Destination : NavDestination {
         ${getInvokeParamsCode(destination.parameters)}
     ): NavDirection {
         return object : NavDirection {
-            override val route =
-                "${destination.routeName}/${getRouteArgumentsCode(destination.parameters)}"
+            override val route = "${destination.routeName}/${getRouteArgumentsCode(destination.parameters)}"
         }
     }
     
@@ -85,7 +86,9 @@ fun getInvokeParamsCode(arguments: List<FunctionParameter>): String {
 fun getRouteArgumentsCode(arguments: List<FunctionParameter>): String {
     return arguments.joinToString(separator = "/") {
         if (it.type.isSerializable) {
-            "\${SerializableNavType<${it.type.simpleName}>().serializeValue(${it.name})}"
+            "\${${it.type.navType.simpleName}.serializeValue(${it.name})}"
+        } else if (it.type.isParcelable) {
+            "\${${it.type.navType.simpleName}.serializeValue(${it.name})}"
         } else {
             "$${it.name}"
         }
@@ -95,8 +98,10 @@ fun getRouteArgumentsCode(arguments: List<FunctionParameter>): String {
 fun getContentArgumentsCode(arguments: List<FunctionParameter>): String {
     return arguments.joinToString(separator = "\n\t\t\t") {
         var arg = "${it.name} = arguments.${it.type.navType.getFunName}(\"${it.name}\")"
-        if (it.type.navType is NavType.StringNavType) {
-            arg += "!!"
+        when (it.type.navType) {
+            is NavType.StringNavType,
+            is NavType.ParcelableNavType -> arg += "!!"
+            else -> {}
         }
         if (it.type.isSerializable) {
             arg += " as ${it.type.simpleName}"

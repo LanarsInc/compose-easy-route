@@ -4,7 +4,8 @@ data class ParamType(
     val simpleName: String,
     val qualifiedName: String,
     val navType: NavType,
-    val isSerializable: Boolean
+    val isSerializable: Boolean,
+    val isParcelable: Boolean
 ) {
     fun getImportString(): String {
         return "import $qualifiedName"

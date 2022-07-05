@@ -49,6 +49,8 @@ object Dependencies {
         const val javaLibrary = "java-library"
 
         const val kotlinJvm = "org.jetbrains.kotlin.jvm"
+
+        const val kotlinParcelize = "kotlin-parcelize"
     }
 
     object Test {

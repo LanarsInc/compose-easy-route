@@ -6,8 +6,15 @@ sealed class NavType(val simpleName: String, val getFunName: String) {
     object BoolNavType : NavType(simpleName = "NavType.BoolType", getFunName = "getBool")
     object FloatNavType : NavType(simpleName = "NavType.FloatType", getFunName = "getFloat")
     object LongNavType : NavType(simpleName = "NavType.LongType", getFunName = "getLong")
+
     class SerializableNavType(actualType: String) :
         NavType(simpleName = "SerializableNavType<${actualType}>()", "getSerializable")
+
+    class ParcelableNavType(actualType: String) :
+        NavType(
+            simpleName = "ParcelableNavType<${actualType}>(ParcelableNavTypeSerializer($actualType::class.java))",
+            "getParcelable"
+        )
 
     companion object {
         fun forType(qualifiedName: String): NavType {
