@@ -32,10 +32,14 @@ object Dependencies {
         const val androidLibraryVersion = "7.2.1"
 
         const val kotlinAndroid = "org.jetbrains.kotlin.android"
-        const val kotlinAndroidVersion = "1.7.0"
+        const val kotlinVersion = "1.7.0"
 
         const val ksp = "com.google.devtools.ksp"
         const val kspVersion = "1.7.0-1.0.6"
+
+        const val javaLibrary = "java-library"
+
+        const val kotlinJvm = "org.jetbrains.kotlin.jvm"
     }
 
     object Test {

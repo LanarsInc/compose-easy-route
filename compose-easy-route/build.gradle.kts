@@ -33,6 +33,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":compose-easy-route-core"))
+
     implementation(Dependencies.Android.coreKtx)
     implementation(Dependencies.Android.appcompat)
     implementation(Dependencies.Compose.material)
