@@ -7,7 +7,9 @@ import com.gsrocks.compose_easy_route.sample.models.Person
 @Destination(name = "first-page")
 @Composable
 fun FirstPage(
-    person: Person
+    person: Person,
+    name: String,
+    age: Int
 ) {
 
 }

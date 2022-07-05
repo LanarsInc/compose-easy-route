@@ -2,6 +2,8 @@ package com.gsrocks.compose_easy_route.generator.generation.template
 
 import com.gsrocks.compose_easy_route.generator.constants.Constants
 import com.gsrocks.compose_easy_route.generator.model.DestinationWithParams
+import com.gsrocks.compose_easy_route.generator.model.FunctionParameter
+import com.gsrocks.compose_easy_route.generator.model.NavType
 
 fun getDestinationNoParamsTemplate(rawDestination: DestinationWithParams): String {
     return """
@@ -27,7 +29,7 @@ object ${rawDestination.composableName}Destination : NavDestination {
 """.trimIndent()
 }
 
-fun getDestinationWthParamsTemplate(rawDestination: DestinationWithParams): String {
+fun getDestinationWthParamsTemplate(destination: DestinationWithParams): String {
     return """
 import androidx.compose.runtime.Composable
 import ${Constants.BASE_PACKAGE_NAME}.navigation.NavDestination
@@ -36,51 +38,70 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import ${Constants.BASE_PACKAGE_NAME}.core.model.NavDirection
 import ${Constants.BASE_PACKAGE_NAME}.navtype.SerializableNavType
-import ${rawDestination.composableQualifiedName}
-${rawDestination.parameters.joinToString(separator = "\n") { it.type.getImportString() }}
+import ${destination.composableQualifiedName}
+${destination.parameters.joinToString(separator = "\n") { it.type.getImportString() }}
 
-object ${rawDestination.composableName}Destination : NavDestination {
-    override val routeName = "${rawDestination.routeName}"
+object ${destination.composableName}Destination : NavDestination {
+    override val routeName = "${destination.routeName}"
     
-    override val fullRoute = "${rawDestination.getFullPath()}"
+    override val fullRoute = "${destination.getFullPath()}"
     
     override val arguments = listOf(
-        ${rawDestination.parameters.joinToString(separator = "\n") {
-            "navArgument(\"${it.name}\") { type = ${it.type.navType.simpleName} },"
-        }}
+        ${getNavArgumentsCode(destination.parameters)}
     )
     
     operator fun invoke(
-        ${
-            rawDestination.parameters.joinToString(separator = "\n") {
-                "${it.name}: ${it.type.simpleName},"
-            }
-        }
+        ${getInvokeParamsCode(destination.parameters)}
     ): NavDirection {
         return object : NavDirection {
-            override val route = "${rawDestination.routeName}/${
-                rawDestination.parameters.joinToString(separator = "/") {
-                    if (it.type.isSerializable) {
-                        "\${SerializableNavType<${it.type.simpleName}>().serializeValue(${it.name})}"
-                    } else {
-                        "$${it.name}"
-                    }
-                }
-            }"
+            override val route =
+                "${destination.routeName}/${getRouteArgumentsCode(destination.parameters)}"
         }
     }
     
     @Composable
     override fun Content(backStackEntry: NavBackStackEntry) {
         val arguments = backStackEntry.arguments!!
-        ${rawDestination.composableName}(
-            ${
-                rawDestination.parameters.joinToString(separator = "\n") {
-                    "${it.name} = arguments.${it.type.navType.getFunName}(\"${it.name}\")!! as ${it.type.simpleName},"
-                }
-            }
+        ${destination.composableName}(
+            ${getContentArgumentsCode(destination.parameters)}
         )
     }
 }
 """.trimIndent()
+}
+
+fun getNavArgumentsCode(arguments: List<FunctionParameter>): String {
+    return arguments.joinToString(separator = "\n\t\t") {
+        "navArgument(\"${it.name}\") { type = ${it.type.navType.simpleName} },"
+    }
+}
+
+fun getInvokeParamsCode(arguments: List<FunctionParameter>): String {
+    return arguments.joinToString(separator = "\n\t\t") {
+        "${it.name}: ${it.type.simpleName},"
+    }
+}
+
+fun getRouteArgumentsCode(arguments: List<FunctionParameter>): String {
+    return arguments.joinToString(separator = "/") {
+        if (it.type.isSerializable) {
+            "\${SerializableNavType<${it.type.simpleName}>().serializeValue(${it.name})}"
+        } else {
+            "$${it.name}"
+        }
+    }
+}
+
+fun getContentArgumentsCode(arguments: List<FunctionParameter>): String {
+    return arguments.joinToString(separator = "\n\t\t\t") {
+        var arg = "${it.name} = arguments.${it.type.navType.getFunName}(\"${it.name}\")"
+        if (it.type.navType is NavType.StringNavType) {
+            arg += "!!"
+        }
+        if (it.type.isSerializable) {
+            arg += " as ${it.type.simpleName}"
+        }
+        arg += ","
+        return@joinToString arg
+    }
 }
