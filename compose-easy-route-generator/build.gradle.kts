@@ -10,4 +10,8 @@ java {
 
 dependencies {
     implementation(project(":compose-easy-route-core"))
+
+    implementation(Dependencies.CodeGen.ksp)
+    implementation(Dependencies.CodeGen.kotlinPoet)
+    implementation(Dependencies.CodeGen.kotlinPoetKsp)
 }

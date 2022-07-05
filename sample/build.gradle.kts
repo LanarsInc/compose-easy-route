@@ -51,6 +51,7 @@ android {
 
 dependencies {
     implementation(project(":compose-easy-route"))
+    ksp(project(":compose-easy-route-generator"))
 
     implementation(Dependencies.Compose.ui)
     implementation(Dependencies.Compose.material)

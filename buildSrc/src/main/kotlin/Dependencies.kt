@@ -12,6 +12,7 @@ object Dependencies {
         const val material = "androidx.compose.material:material:$composeVersion"
         const val preview = "androidx.compose.ui:ui-tooling-preview:$composeVersion"
         const val activityCompose = "androidx.activity:activity-compose:1.5.0"
+        const val navigation = "androidx.navigation:navigation-compose:2.5.0"
 
         const val uiTooling = "androidx.compose.ui:ui-tooling:$composeVersion"
         const val uiTestManifest = "androidx.compose.ui:ui-test-manifest:$composeVersion"
@@ -22,6 +23,14 @@ object Dependencies {
     object Lifecycle {
         private const val version = "2.5.0"
         const val lifecycleKtx = "androidx.lifecycle:lifecycle-runtime-ktx:$version"
+    }
+
+    object CodeGen {
+        const val ksp = "com.google.devtools.ksp:symbol-processing-api:1.7.0-1.0.6"
+
+        const val kotlinPoetVersion = "1.12.0"
+        const val kotlinPoet = "com.squareup:kotlinpoet:$kotlinPoetVersion"
+        const val kotlinPoetKsp = "com.squareup:kotlinpoet-ksp:$kotlinPoetVersion"
     }
 
     object Plugins {
