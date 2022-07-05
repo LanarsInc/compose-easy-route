@@ -3,52 +3,32 @@ package com.gsrocks.compose_easy_route.sample
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.gsrocks.compose_easy_route.GreetingDestination
-import com.gsrocks.compose_easy_route.core.annotation.Destination
+import androidx.compose.runtime.staticCompositionLocalOf
+import com.gsrocks.compose_easy_route.FirstPageDestination
+import com.gsrocks.compose_easy_route.RootNavGraph
 import com.gsrocks.compose_easy_route.navigation.EasyRouteNavHost
 import com.gsrocks.compose_easy_route.navigation.NavigationManager
 import com.gsrocks.compose_easy_route.sample.ui.theme.ComposeEasyRouteSampleTheme
+
+val LocalNavigationProvider = staticCompositionLocalOf { NavigationManager() }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeEasyRouteSampleTheme {
-                /*val navigationManager = remember { NavigationManager() }
-                EasyRouteNavHost(
-                    navigationManager = navigationManager,
-                    navGraph = ,
-                    initialRoute = GreetingDestination.fullRoute
-                )*/
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Greeting("Android")
+                val navigationManager = remember { NavigationManager() }
+
+                CompositionLocalProvider(LocalNavigationProvider provides navigationManager) {
+                    EasyRouteNavHost(
+                        navigationManager = navigationManager,
+                        navGraph = RootNavGraph,
+                        initialRoute = FirstPageDestination.fullRoute
+                    )
                 }
             }
         }
-    }
-}
-
-@Destination("greeting-page")
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    ComposeEasyRouteSampleTheme {
-        Greeting("Android")
     }
 }

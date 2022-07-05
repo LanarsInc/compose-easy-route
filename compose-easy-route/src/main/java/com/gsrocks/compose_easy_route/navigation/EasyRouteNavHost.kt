@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 @Composable
 fun EasyRouteNavHost(
     navigationManager: NavigationManager,
-    navGraph: List<NavDestination>,
+    navGraph: NavigationGraph,
     initialRoute: String
 ) {
     val navController = rememberNavController()
@@ -37,7 +37,7 @@ fun EasyRouteNavHost(
         navController = navController,
         startDestination = initialRoute,
     ) {
-        navGraph.forEach { destination ->
+        navGraph.destinations.forEach { destination ->
             composable(
                 route = destination.fullRoute,
                 arguments = destination.arguments,
