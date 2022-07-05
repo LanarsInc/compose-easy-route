@@ -35,5 +35,5 @@ android {
 dependencies {
     api(project(":compose-easy-route-core"))
 
-    implementation(Dependencies.Compose.navigation)
+    api(Dependencies.Compose.navigation)
 }
