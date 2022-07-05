@@ -1,6 +1,7 @@
 object Dependencies {
     object Android {
         const val coreKtx = "androidx.core:core-ktx:1.8.0"
+        const val appcompat = "androidx.appcompat:appcompat:1.4.2"
     }
 
     object Compose {
