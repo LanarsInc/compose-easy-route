@@ -11,16 +11,21 @@ import com.gsrocks.compose_easy_route.RootNavGraph
 import com.gsrocks.compose_easy_route.navigation.EasyRouteNavHost
 import com.gsrocks.compose_easy_route.navigation.NavigationManager
 import com.gsrocks.compose_easy_route.sample.ui.theme.ComposeEasyRouteSampleTheme
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 val LocalNavigationProvider = staticCompositionLocalOf { NavigationManager() }
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var navigationManager: NavigationManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeEasyRouteSampleTheme {
-                val navigationManager = remember { NavigationManager() }
-
                 CompositionLocalProvider(LocalNavigationProvider provides navigationManager) {
                     EasyRouteNavHost(
                         navigationManager = navigationManager,

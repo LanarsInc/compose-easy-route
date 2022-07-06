@@ -25,6 +25,13 @@ object Dependencies {
         const val lifecycleKtx = "androidx.lifecycle:lifecycle-runtime-ktx:$version"
     }
 
+    object Hilt {
+        const val version = "2.42"
+        const val hiltAndroid = "com.google.dagger:hilt-android:$version"
+        const val hiltCompiler = "com.google.dagger:hilt-android-compiler:$version"
+        const val navigationCompose = "androidx.hilt:hilt-navigation-compose:1.0.0"
+    }
+
     object CodeGen {
         const val ksp = "com.google.devtools.ksp:symbol-processing-api:1.7.0-1.0.6"
 
@@ -51,6 +58,12 @@ object Dependencies {
         const val kotlinJvm = "org.jetbrains.kotlin.jvm"
 
         const val kotlinParcelize = "kotlin-parcelize"
+
+        const val kotlinKapt = "kotlin-kapt"
+
+        const val hiltAndroid = "dagger.hilt.android.plugin"
+
+        const val hiltAndroidGradlePlugin = "com.google.dagger:hilt-android-gradle-plugin:2.42"
     }
 
     object Test {

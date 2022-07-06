@@ -13,15 +13,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.gsrocks.compose_easy_route.SecondPageDestination
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.gsrocks.compose_easy_route.core.annotation.Destination
-import com.gsrocks.compose_easy_route.sample.LocalNavigationProvider
-import com.gsrocks.compose_easy_route.sample.models.Person
 
 @Destination(name = "first-page")
 @Composable
 fun FirstPage() {
-    val navigator = LocalNavigationProvider.current
+    val viewModel: FirstViewModel = hiltViewModel()
 
     var name by rememberSaveable { mutableStateOf("") }
 
@@ -35,19 +33,7 @@ fun FirstPage() {
         ) {
             TextField(value = name, onValueChange = { name = it })
             Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    navigator.navigate(
-                        SecondPageDestination(
-                            person = Person(
-                                name = name,
-                                age = 23
-                            ),
-                            number = 999
-                        )
-                    )
-                }
-            ) {
+            Button(onClick = { viewModel.navigateToSecond(name) }) {
                 Text(text = "Go to second page ->")
             }
         }

@@ -3,6 +3,8 @@ plugins {
     id(Dependencies.Plugins.kotlinAndroid)
     id(Dependencies.Plugins.ksp) version Dependencies.Plugins.kspVersion
     id(Dependencies.Plugins.kotlinParcelize)
+    id(Dependencies.Plugins.kotlinKapt)
+    id(Dependencies.Plugins.hiltAndroid)
 }
 
 android {
@@ -71,6 +73,10 @@ dependencies {
 
     implementation(Dependencies.Android.coreKtx)
     implementation(Dependencies.Lifecycle.lifecycleKtx)
+
+    implementation(Dependencies.Hilt.hiltAndroid)
+    kapt(Dependencies.Hilt.hiltCompiler)
+    implementation(Dependencies.Hilt.navigationCompose)
 
     testImplementation(Dependencies.Test.junit)
     androidTestImplementation(Dependencies.Test.androidExtJunit)
