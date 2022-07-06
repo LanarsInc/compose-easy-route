@@ -19,14 +19,20 @@ fun EasyRouteNavHost(
         navigationManager.commandFlow.receiveAsFlow().collect { command ->
             when (command) {
                 is NavigationCommand.NavigateCommand -> {
-                    if (command.destination.route.isNotEmpty()) {
+                    if (command.direction.route.isNotEmpty()) {
                         navController.navigate(
-                            command.destination.route
+                            command.direction.route
                         )
                     }
                 }
                 is NavigationCommand.PopCommand -> {
                     navController.popBackStack()
+                }
+                is NavigationCommand.PopUpToCommand -> {
+                    navController.popBackStack(
+                        command.route,
+                        inclusive = command.inclusive
+                    )
                 }
                 else -> {}
             }

@@ -11,9 +11,19 @@ class NavigationManager {
         commandFlow.trySendBlocking(NavigationCommand.PopCommand)
     }
 
-    fun popUpTo(destination: NavDirection) {}
+    fun popUpTo(destination: NavDestination, inclusive: Boolean) {
+        commandFlow.trySendBlocking(NavigationCommand.PopUpToCommand(destination, inclusive))
+    }
+
+    fun popUpTo(route: String, inclusive: Boolean) {
+        commandFlow.trySendBlocking(NavigationCommand.PopUpToCommand(route, inclusive))
+    }
 
     fun navigate(destination: NavDirection) {
         commandFlow.trySendBlocking(NavigationCommand.NavigateCommand(destination))
+    }
+
+    fun navigate(route: String) {
+        commandFlow.trySendBlocking(NavigationCommand.NavigateCommand(route))
     }
 }
