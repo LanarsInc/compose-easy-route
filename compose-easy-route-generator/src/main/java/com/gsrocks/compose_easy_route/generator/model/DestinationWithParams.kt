@@ -9,7 +9,11 @@ data class DestinationWithParams(
     fun getFullPath(): String {
         var fullPath = routeName
         parameters.forEach { funParameter ->
-            fullPath += "/{${funParameter.name}}"
+            fullPath += if (funParameter.hasDefault) {
+                "?${funParameter.name}={${funParameter.name}}"
+            } else {
+                "/{${funParameter.name}}"
+            }
         }
         return fullPath
     }

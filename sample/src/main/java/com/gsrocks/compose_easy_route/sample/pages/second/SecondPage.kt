@@ -17,7 +17,7 @@ import com.gsrocks.compose_easy_route.sample.models.Person
 @Composable
 fun SecondPage(
     person: Person,
-    number: Int
+    number: Int = 56,
 ) {
     Scaffold { paddingValues ->
         Box(

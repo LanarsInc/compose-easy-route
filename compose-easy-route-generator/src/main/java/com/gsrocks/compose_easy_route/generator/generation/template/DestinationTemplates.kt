@@ -42,6 +42,7 @@ import ${Constants.BASE_PACKAGE_NAME}.serializer.ParcelableNavTypeSerializer
 import ${Constants.BASE_PACKAGE_NAME}.navtype.ParcelableNavType
 import ${destination.composableQualifiedName}
 ${destination.parameters.joinToString(separator = "\n") { it.type.getImportString() }}
+${getDefaultParametersImports(destination.parameters)}
 
 object ${destination.composableName}Destination : NavDestination {
     override val routeName = "${destination.routeName}"
@@ -56,7 +57,7 @@ object ${destination.composableName}Destination : NavDestination {
         ${getInvokeParamsCode(destination.parameters)}
     ): NavDirection {
         return object : NavDirection {
-            override val route = "${destination.routeName}/${getRouteArgumentsCode(destination.parameters)}"
+            override val route = "${destination.routeName}${getRouteArgumentsCode(destination.parameters)}"
         }
     }
     
@@ -73,25 +74,37 @@ object ${destination.composableName}Destination : NavDestination {
 
 fun getNavArgumentsCode(arguments: List<FunctionParameter>): String {
     return arguments.joinToString(separator = "\n\t\t") {
-        "navArgument(\"${it.name}\") { type = ${it.type.navType.simpleName} },"
+        var code = "navArgument(\"${it.name}\") { type = ${it.type.navType.simpleName}"
+        if (it.hasDefault && it.defaultValue != null) {
+            code += "; defaultValue = ${it.defaultValue.code}"
+        }
+        code += " },"
+        code
     }
 }
 
 fun getInvokeParamsCode(arguments: List<FunctionParameter>): String {
     return arguments.joinToString(separator = "\n\t\t") {
-        "${it.name}: ${it.type.simpleName},"
+        if (it.hasDefault && it.defaultValue != null) {
+            "${it.name}: ${it.type.simpleName} = ${it.defaultValue.code},"
+        } else {
+            "${it.name}: ${it.type.simpleName},"
+        }
     }
 }
 
 fun getRouteArgumentsCode(arguments: List<FunctionParameter>): String {
-    return arguments.joinToString(separator = "/") {
-        if (it.type.isSerializable) {
+    return arguments.joinToString(separator = "") {
+        var argumentRoutePart =
+            if (it.hasDefault && it.defaultValue != null) "?${it.name}=" else "/"
+        argumentRoutePart += if (it.type.isSerializable) {
             "\${${it.type.navType.simpleName}.serializeValue(${it.name})}"
         } else if (it.type.isParcelable) {
             "\${${it.type.navType.simpleName}.serializeValue(${it.name})}"
         } else {
             "$${it.name}"
         }
+        argumentRoutePart
     }
 }
 
@@ -109,4 +122,9 @@ fun getContentArgumentsCode(arguments: List<FunctionParameter>): String {
         arg += ","
         return@joinToString arg
     }
+}
+
+fun getDefaultParametersImports(arguments: List<FunctionParameter>): String {
+    return arguments.filter { it.hasDefault && it.defaultValue != null }
+        .flatMap { it.defaultValue!!.imports }.joinToString(separator = "\n")
 }

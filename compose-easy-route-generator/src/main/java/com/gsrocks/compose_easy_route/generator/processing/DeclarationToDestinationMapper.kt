@@ -33,7 +33,7 @@ class DeclarationToDestinationMapper(
             composableName = simpleName.asString(),
             composableQualifiedName = qualifiedName?.asString() ?: String.empty,
             routeName = routeName,
-            parameters = parameters.filter { !it.hasDefault }.map { it.toFunctionParam() }
+            parameters = parameters.map { it.toFunctionParam() }
         )
     }
 
@@ -74,7 +74,8 @@ class DeclarationToDestinationMapper(
                 isSerializable = isSerializable,
                 isParcelable = isParcelable
             ),
-            hasDefault = hasDefault
+            hasDefault = hasDefault,
+            defaultValue = getDefaultValue(resolver)
         )
     }
 }
