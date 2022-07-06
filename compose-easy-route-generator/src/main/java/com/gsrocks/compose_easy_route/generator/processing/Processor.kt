@@ -2,9 +2,12 @@ package com.gsrocks.compose_easy_route.generator.processing
 
 import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
+import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.gsrocks.compose_easy_route.core.annotation.Destination
 import com.gsrocks.compose_easy_route.generator.generation.MainGenerator
+import com.gsrocks.compose_easy_route.generator.utils.findAnnotation
+import com.gsrocks.compose_easy_route.generator.utils.hasAnnotation
 
 class Processor(
     private val codeGenerator: CodeGenerator,
@@ -31,5 +34,6 @@ class Processor(
     private fun Resolver.getComposableDestinations(): Sequence<KSFunctionDeclaration> {
         return getSymbolsWithAnnotation(Destination::class.qualifiedName!!)
             .filterIsInstance<KSFunctionDeclaration>()
+            .filter { it.hasAnnotation("Composable") }
     }
 }
