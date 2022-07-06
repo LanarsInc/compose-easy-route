@@ -3,18 +3,15 @@ package com.gsrocks.compose_easy_route.generator.processing
 import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
+import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
-import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.gsrocks.compose_easy_route.core.annotation.Destination
 import com.gsrocks.compose_easy_route.core.utils.empty
 import com.gsrocks.compose_easy_route.generator.constants.Constants
+import com.gsrocks.compose_easy_route.generator.model.*
 import com.gsrocks.compose_easy_route.generator.utils.findAnnotation
 import com.gsrocks.compose_easy_route.generator.utils.findArgumentValue
-import com.gsrocks.compose_easy_route.generator.model.DestinationWithParams
-import com.gsrocks.compose_easy_route.generator.model.FunctionParameter
-import com.gsrocks.compose_easy_route.generator.model.NavType
-import com.gsrocks.compose_easy_route.generator.model.ParamType
 
 class DeclarationToDestinationMapper(
     private val resolver: Resolver,
@@ -28,12 +25,23 @@ class DeclarationToDestinationMapper(
         val destinationAnnotation = findAnnotation(Destination::class.simpleName!!)
         val routeName =
             destinationAnnotation.findArgumentValue<String>(Constants.ROUTE_NAME_PARAM)!!
+        val deepLinks =
+            destinationAnnotation.findArgumentValue<ArrayList<KSAnnotation>>(Constants.DEEP_LINKS_PARAM)!!
 
         return DestinationWithParams(
             composableName = simpleName.asString(),
             composableQualifiedName = qualifiedName?.asString() ?: String.empty,
             routeName = routeName,
-            parameters = parameters.map { it.toFunctionParam() }
+            parameters = parameters.map { it.toFunctionParam() },
+            deepLinks = deepLinks.map { it.toDeepLink() }
+        )
+    }
+
+    private fun KSAnnotation.toDeepLink(): DeepLink {
+        return DeepLink(
+            uriPattern = findArgumentValue("uriPattern")!!,
+            action = findArgumentValue("action")!!,
+            mimeType = findArgumentValue("mimeType")!!,
         )
     }
 

@@ -47,6 +47,7 @@ fun EasyRouteNavHost(
             composable(
                 route = destination.fullRoute,
                 arguments = destination.arguments,
+                deepLinks = destination.deepLinks
             ) { backStackEntry ->
                 destination.Content(backStackEntry)
             }

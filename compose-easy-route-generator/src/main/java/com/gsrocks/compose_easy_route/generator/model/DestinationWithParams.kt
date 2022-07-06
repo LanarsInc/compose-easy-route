@@ -4,7 +4,8 @@ data class DestinationWithParams(
     val composableName: String,
     val composableQualifiedName: String,
     val routeName: String,
-    val parameters: List<FunctionParameter>
+    val parameters: List<FunctionParameter>,
+    val deepLinks: List<DeepLink>
 ) {
     fun getFullPath(): String {
         var fullPath = routeName

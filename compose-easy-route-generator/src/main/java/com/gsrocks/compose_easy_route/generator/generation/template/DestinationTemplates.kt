@@ -1,29 +1,34 @@
 package com.gsrocks.compose_easy_route.generator.generation.template
 
 import com.gsrocks.compose_easy_route.generator.constants.Constants
+import com.gsrocks.compose_easy_route.generator.model.DeepLink
 import com.gsrocks.compose_easy_route.generator.model.DestinationWithParams
 import com.gsrocks.compose_easy_route.generator.model.FunctionParameter
 import com.gsrocks.compose_easy_route.generator.model.NavType
 
-fun getDestinationNoParamsTemplate(rawDestination: DestinationWithParams): String {
+fun getDestinationNoParamsTemplate(destination: DestinationWithParams): String {
     return """
 import androidx.compose.runtime.Composable
 import ${Constants.BASE_PACKAGE_NAME}.navigation.NavDestination
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NamedNavArgument
-import ${rawDestination.composableQualifiedName}
-${rawDestination.parameters.joinToString(separator = "\n") { it.type.getImportString() }}
+import androidx.navigation.navDeepLink
+import ${destination.composableQualifiedName}
+import androidx.navigation.*
+${destination.parameters.joinToString(separator = "\n") { it.type.getImportString() }}
 
-object ${rawDestination.composableName}Destination : NavDestination {
-    override val routeName = "${rawDestination.routeName}"
+object ${destination.composableName}Destination : NavDestination {
+    override val routeName = "${destination.routeName}"
     
-    override val fullRoute = "${rawDestination.getFullPath()}"
+    override val fullRoute = "${destination.getFullPath()}"
     
     override val arguments = emptyList<NamedNavArgument>()
     
+    override val deepLinks = ${getDeepLinksCode(destination.deepLinks)}
+    
     @Composable
     override fun Content(backStackEntry: NavBackStackEntry) {
-        ${rawDestination.composableName}()
+        ${destination.composableName}()
     }
 }
 """.trimIndent()
@@ -40,7 +45,9 @@ import ${Constants.BASE_PACKAGE_NAME}.core.model.NavDirection
 import ${Constants.BASE_PACKAGE_NAME}.navtype.SerializableNavType
 import ${Constants.BASE_PACKAGE_NAME}.serializer.ParcelableNavTypeSerializer
 import ${Constants.BASE_PACKAGE_NAME}.navtype.ParcelableNavType
+import androidx.navigation.navDeepLink
 import ${destination.composableQualifiedName}
+import androidx.navigation.*
 ${destination.parameters.joinToString(separator = "\n") { it.type.getImportString() }}
 ${getDefaultParametersImports(destination.parameters)}
 
@@ -52,6 +59,8 @@ object ${destination.composableName}Destination : NavDestination {
     override val arguments = listOf(
         ${getNavArgumentsCode(destination.parameters)}
     )
+    
+    override val deepLinks = ${getDeepLinksCode(destination.deepLinks)}
     
     operator fun invoke(
         ${getInvokeParamsCode(destination.parameters)}
@@ -127,4 +136,20 @@ fun getContentArgumentsCode(arguments: List<FunctionParameter>): String {
 fun getDefaultParametersImports(arguments: List<FunctionParameter>): String {
     return arguments.filter { it.hasDefault && it.defaultValue != null }
         .flatMap { it.defaultValue!!.imports }.joinToString(separator = "\n")
+}
+
+fun getDeepLinksCode(deepLinks: List<DeepLink>): String {
+    if (deepLinks.isEmpty()) {
+        return "emptyList<NavDeepLink>()"
+    }
+    return "listOf(\n\t\t" + deepLinks.joinToString(separator = ",\n\t\t") {
+        val uriPattern = if (it.uriPattern.isBlank()) null else "\"${it.uriPattern}\""
+        val action = if (it.action.isBlank()) null else "\"${it.action}\""
+        val mimeType = if (it.mimeType.isBlank()) null else "\"${it.mimeType}\""
+        """navDeepLink {
+            uriPattern = $uriPattern
+            action = $action
+            mimeType = $mimeType
+        }"""
+    } + "\n\t)"
 }
