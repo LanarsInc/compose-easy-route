@@ -15,6 +15,7 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.navDeepLink
 import ${destination.composableQualifiedName}
 import androidx.navigation.*
+import ${Constants.BASE_PACKAGE_NAME}.core.model.NavDirection
 ${destination.parameters.joinToString(separator = "\n") { it.type.getImportString() }}
 
 object ${destination.composableName}Destination : NavDestination {
@@ -25,6 +26,12 @@ object ${destination.composableName}Destination : NavDestination {
     override val arguments = emptyList<NamedNavArgument>()
     
     override val deepLinks = ${getDeepLinksCode(destination.deepLinks)}
+    
+    operator fun invoke(): NavDirection {
+        return object : NavDirection {
+            override val route = "${destination.routeName}"
+        }
+    }
     
     @Composable
     override fun Content(backStackEntry: NavBackStackEntry) {

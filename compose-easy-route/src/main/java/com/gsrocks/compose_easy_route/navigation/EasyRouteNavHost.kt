@@ -2,8 +2,10 @@ package com.gsrocks.compose_easy_route.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.flow.receiveAsFlow
 
@@ -43,14 +45,27 @@ fun EasyRouteNavHost(
         navController = navController,
         startDestination = initialRoute,
     ) {
-        navGraph.destinations.forEach { destination ->
-            composable(
-                route = destination.fullRoute,
-                arguments = destination.arguments,
-                deepLinks = destination.deepLinks
-            ) { backStackEntry ->
-                destination.Content(backStackEntry)
-            }
+        buildGraphs(navGraph)
+    }
+}
+
+fun NavGraphBuilder.buildGraphs(navGraph: NavigationGraph) {
+    navGraph.destinations.forEach { destination ->
+        composable(
+            route = destination.fullRoute,
+            arguments = destination.arguments,
+            deepLinks = destination.deepLinks
+        ) { backStackEntry ->
+            destination.Content(backStackEntry)
+        }
+    }
+
+    navGraph.nestedGraphs.forEach { nestedGraph ->
+        navigation(
+            startDestination = nestedGraph.startRoute,
+            route = nestedGraph.route
+        ) {
+            buildGraphs(nestedGraph)
         }
     }
 }

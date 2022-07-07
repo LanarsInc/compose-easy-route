@@ -6,20 +6,25 @@ import com.gsrocks.compose_easy_route.generator.generation.writer.DestinationWri
 import com.gsrocks.compose_easy_route.generator.generation.writer.NavGraphWriter
 import com.gsrocks.compose_easy_route.generator.model.DestinationWithParams
 import com.gsrocks.compose_easy_route.generator.model.NavGraphInfo
+import com.gsrocks.compose_easy_route.generator.model.NestedGraph
 
 class MainGenerator(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger
 ) {
-    fun generate(destinations: List<DestinationWithParams>) {
+    fun generate(
+        destinations: List<DestinationWithParams>,
+        nestedGraphs: List<NestedGraph>,
+        startRoute: String
+    ) {
         val destinationWriter = DestinationWriter(codeGenerator, logger)
+        val navGraphWriter = NavGraphWriter(codeGenerator, logger)
 
         for (destination in destinations) {
             destinationWriter.write(destination)
         }
 
-        val navGraphInfo = NavGraphInfo(destinations)
-        val navGraphWriter = NavGraphWriter(codeGenerator, logger)
+        val navGraphInfo = NavGraphInfo(destinations, nestedGraphs, startRoute)
         navGraphWriter.write(navGraphInfo)
     }
 }

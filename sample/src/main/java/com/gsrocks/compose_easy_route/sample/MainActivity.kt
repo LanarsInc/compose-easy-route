@@ -7,7 +7,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.gsrocks.compose_easy_route.FirstPageDestination
-import com.gsrocks.compose_easy_route.RootNavGraph
+import com.gsrocks.compose_easy_route.NavGraphs
+import com.gsrocks.compose_easy_route.core.annotation.NavGraph
 import com.gsrocks.compose_easy_route.navigation.EasyRouteNavHost
 import com.gsrocks.compose_easy_route.navigation.NavigationManager
 import com.gsrocks.compose_easy_route.sample.ui.theme.ComposeEasyRouteSampleTheme
@@ -29,7 +30,7 @@ class MainActivity : ComponentActivity() {
                 CompositionLocalProvider(LocalNavigationProvider provides navigationManager) {
                     EasyRouteNavHost(
                         navigationManager = navigationManager,
-                        navGraph = RootNavGraph,
+                        navGraph = NavGraphs.root,
                         initialRoute = FirstPageDestination.fullRoute
                     )
                 }
@@ -37,3 +38,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+@NavGraph(route = "settings", startRoute = "third-page")
+annotation class SettingsNavGraph()

@@ -10,17 +10,14 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
 import com.gsrocks.compose_easy_route.core.annotation.Destination
 import com.gsrocks.compose_easy_route.core.annotation.EasyRouteDeepLink
+import com.gsrocks.compose_easy_route.sample.SettingsNavGraph
 
+@SettingsNavGraph
 @Destination(
-    name = "third-page",
-    deepLinks = [
-        EasyRouteDeepLink(
-            uriPattern = "https://www.example.com/third/?name={name}"
-        )
-    ]
+    name = "third-page"
 )
 @Composable
-fun ThirdPage(name: String) {
+fun ThirdPage() {
     Scaffold { paddingValues ->
         Column(
             modifier = Modifier
@@ -30,7 +27,7 @@ fun ThirdPage(name: String) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Hello, $name!",
+                text = "Hello!",
                 style = TextStyle(fontSize = 24.sp)
             )
         }

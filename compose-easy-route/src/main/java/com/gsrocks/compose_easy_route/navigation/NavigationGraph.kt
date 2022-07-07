@@ -1,5 +1,8 @@
 package com.gsrocks.compose_easy_route.navigation
 
-interface NavigationGraph {
-    val destinations: List<NavDestination>
-}
+data class NavigationGraph(
+    val route: String,
+    val startRoute: String,
+    val destinations: List<NavDestination>,
+    val nestedGraphs: List<NavigationGraph> = emptyList()
+)

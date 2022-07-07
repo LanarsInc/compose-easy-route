@@ -11,6 +11,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gsrocks.compose_easy_route.FirstPageDestination
+import com.gsrocks.compose_easy_route.ThirdPageDestination
 import com.gsrocks.compose_easy_route.core.annotation.Destination
 import com.gsrocks.compose_easy_route.sample.LocalNavigationProvider
 import com.gsrocks.compose_easy_route.sample.models.Person
@@ -38,7 +39,7 @@ fun SecondPage(
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
-                    navigator.popUpTo(FirstPageDestination, false)
+                    navigator.navigate(ThirdPageDestination())
                 }
             ) {
                 Text(text = "Pop up to first")

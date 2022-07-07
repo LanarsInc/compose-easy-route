@@ -12,28 +12,35 @@ import com.gsrocks.compose_easy_route.generator.constants.Constants
 import com.gsrocks.compose_easy_route.generator.model.*
 import com.gsrocks.compose_easy_route.generator.utils.findAnnotation
 import com.gsrocks.compose_easy_route.generator.utils.findArgumentValue
+import com.gsrocks.compose_easy_route.generator.utils.hasAnnotation
 
 class DeclarationToDestinationMapper(
     private val resolver: Resolver,
     private val logger: KSPLogger
 ) {
-    fun map(composableDestinations: Sequence<KSFunctionDeclaration>): List<DestinationWithParams> {
-        return composableDestinations.map { it.toDestination() }.toList()
+    fun map(
+        composableDestinations: Sequence<KSFunctionDeclaration>,
+        navGraphs: Sequence<NestedGraph>
+    ): List<DestinationWithParams> {
+        return composableDestinations.map { it.toDestination(navGraphs) }.toList()
     }
 
-    private fun KSFunctionDeclaration.toDestination(): DestinationWithParams {
+    private fun KSFunctionDeclaration.toDestination(navGraphs: Sequence<NestedGraph>): DestinationWithParams {
         val destinationAnnotation = findAnnotation(Destination::class.simpleName!!)
         val routeName =
             destinationAnnotation.findArgumentValue<String>(Constants.ROUTE_NAME_PARAM)!!
         val deepLinks =
             destinationAnnotation.findArgumentValue<ArrayList<KSAnnotation>>(Constants.DEEP_LINKS_PARAM)!!
 
+        val nestedGraph = navGraphs.firstOrNull { hasAnnotation(it.simpleName) }
+
         return DestinationWithParams(
             composableName = simpleName.asString(),
             composableQualifiedName = qualifiedName?.asString() ?: String.empty,
             routeName = routeName,
             parameters = parameters.map { it.toFunctionParam() },
-            deepLinks = deepLinks.map { it.toDeepLink() }
+            deepLinks = deepLinks.map { it.toDeepLink() },
+            nestedGraph = nestedGraph
         )
     }
 

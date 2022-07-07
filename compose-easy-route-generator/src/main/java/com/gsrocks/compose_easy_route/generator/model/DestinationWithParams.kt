@@ -5,7 +5,8 @@ data class DestinationWithParams(
     val composableQualifiedName: String,
     val routeName: String,
     val parameters: List<FunctionParameter>,
-    val deepLinks: List<DeepLink>
+    val deepLinks: List<DeepLink>,
+    val nestedGraph: NestedGraph? = null
 ) {
     fun getFullPath(): String {
         var fullPath = routeName
