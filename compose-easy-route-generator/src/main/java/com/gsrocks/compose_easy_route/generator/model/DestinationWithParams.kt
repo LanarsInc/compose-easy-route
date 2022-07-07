@@ -6,7 +6,8 @@ data class DestinationWithParams(
     val routeName: String,
     val parameters: List<FunctionParameter>,
     val deepLinks: List<DeepLink>,
-    val nestedGraph: NestedGraph? = null
+    val nestedGraph: NestedGraph? = null,
+    val backStackEntryParamName: String? = null
 ) {
     fun getFullPath(): String {
         var fullPath = routeName

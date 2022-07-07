@@ -12,20 +12,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
-import com.gsrocks.compose_easy_route.FourthPageDestination
 import com.gsrocks.compose_easy_route.core.annotation.Destination
 import com.gsrocks.compose_easy_route.core.annotation.ParentBackStackEntry
-import com.gsrocks.compose_easy_route.sample.LocalNavigationProvider
 import com.gsrocks.compose_easy_route.sample.SettingsNavGraph
 
 @SettingsNavGraph
-@Destination(name = "third-page")
+@Destination(name = "fourth-page")
 @Composable
-fun ThirdPage(
+fun FourthPage(
     @ParentBackStackEntry parentBackStackEntry: NavBackStackEntry
 ) {
     val viewModel = hiltViewModel<SharedViewModel>(parentBackStackEntry)
-    val navigator = LocalNavigationProvider.current
 
     Scaffold { paddingValues ->
         Column(
@@ -40,12 +37,8 @@ fun ThirdPage(
                 style = TextStyle(fontSize = 24.sp)
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { viewModel.text = "From third" }) {
+            Button(onClick = { viewModel.text = "From fourth" }) {
                 Text(text = "Set text")
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { navigator.navigate(FourthPageDestination()) }) {
-                Text(text = "Go to fourth page")
             }
         }
     }

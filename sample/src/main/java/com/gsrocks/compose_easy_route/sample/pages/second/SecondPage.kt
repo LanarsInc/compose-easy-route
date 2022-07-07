@@ -42,7 +42,7 @@ fun SecondPage(
                     navigator.navigate(ThirdPageDestination())
                 }
             ) {
-                Text(text = "Pop up to first")
+                Text(text = "Go to nested")
             }
         }
     }

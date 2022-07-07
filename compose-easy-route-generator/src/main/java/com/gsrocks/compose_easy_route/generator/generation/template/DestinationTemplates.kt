@@ -34,8 +34,11 @@ object ${destination.composableName}Destination : NavDestination {
     }
     
     @Composable
-    override fun Content(backStackEntry: NavBackStackEntry) {
-        ${destination.composableName}()
+    override fun Content(
+        backStackEntry: NavBackStackEntry,
+        parentBackStackEntry: NavBackStackEntry
+    ) {
+        ${destination.composableName}(${getBackStackEntryCode(destination.backStackEntryParamName)})
     }
 }
 """.trimIndent()
@@ -78,10 +81,14 @@ object ${destination.composableName}Destination : NavDestination {
     }
     
     @Composable
-    override fun Content(backStackEntry: NavBackStackEntry) {
+    override fun Content(
+        backStackEntry: NavBackStackEntry,
+        parentBackStackEntry: NavBackStackEntry
+    ) {
         val arguments = backStackEntry.arguments!!
         ${destination.composableName}(
             ${getContentArgumentsCode(destination.parameters)}
+            ${getBackStackEntryCode(destination.backStackEntryParamName)}
         )
     }
 }
@@ -159,4 +166,10 @@ fun getDeepLinksCode(deepLinks: List<DeepLink>): String {
             mimeType = $mimeType
         }"""
     } + "\n\t)"
+}
+
+fun getBackStackEntryCode(paramName: String?): String {
+    if (paramName == null) return ""
+
+    return "$paramName = parentBackStackEntry,"
 }

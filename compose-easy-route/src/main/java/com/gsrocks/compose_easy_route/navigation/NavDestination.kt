@@ -15,5 +15,8 @@ interface NavDestination {
     val deepLinks: List<NavDeepLink>
 
     @Composable
-    fun Content(backStackEntry: NavBackStackEntry)
+    fun Content(
+        backStackEntry: NavBackStackEntry,
+        parentBackStackEntry: NavBackStackEntry
+    )
 }

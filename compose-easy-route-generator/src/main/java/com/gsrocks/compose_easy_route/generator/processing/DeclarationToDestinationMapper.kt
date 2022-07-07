@@ -7,6 +7,7 @@ import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSValueParameter
 import com.gsrocks.compose_easy_route.core.annotation.Destination
+import com.gsrocks.compose_easy_route.core.annotation.ParentBackStackEntry
 import com.gsrocks.compose_easy_route.core.utils.empty
 import com.gsrocks.compose_easy_route.generator.constants.Constants
 import com.gsrocks.compose_easy_route.generator.model.*
@@ -38,9 +39,14 @@ class DeclarationToDestinationMapper(
             composableName = simpleName.asString(),
             composableQualifiedName = qualifiedName?.asString() ?: String.empty,
             routeName = routeName,
-            parameters = parameters.map { it.toFunctionParam() },
+            parameters = parameters.filter {
+                !it.hasAnnotation(ParentBackStackEntry::class.simpleName!!)
+            }.map { it.toFunctionParam() },
             deepLinks = deepLinks.map { it.toDeepLink() },
-            nestedGraph = nestedGraph
+            nestedGraph = nestedGraph,
+            backStackEntryParamName = parameters.firstOrNull {
+                it.hasAnnotation(ParentBackStackEntry::class.simpleName!!)
+            }?.name?.asString()
         )
     }
 
@@ -53,6 +59,14 @@ class DeclarationToDestinationMapper(
     }
 
     private fun KSValueParameter.toFunctionParam(): FunctionParameter {
+        /*val hasParentBackStackEntryAnnotation =
+            hasAnnotation(ParentBackStackEntry::class.simpleName!!)
+        val navBackStackEntryType =
+            resolver.getClassDeclarationByName("androidx.navigation.NavBackStackEntry")!!
+                .asType(emptyList())
+        val isBackStackEntry =
+            navBackStackEntryType.isAssignableFrom(it.type.resolve()) && hasParentBackStackEntryAnnotation*/
+
         val resolvedType = type.resolve()
         val resolvedTypeDeclaration = resolvedType.declaration
 
@@ -90,7 +104,7 @@ class DeclarationToDestinationMapper(
                 isParcelable = isParcelable
             ),
             hasDefault = hasDefault,
-            defaultValue = getDefaultValue(resolver)
+            defaultValue = getDefaultValue(resolver),
         )
     }
 }
