@@ -11,19 +11,69 @@ class NavigationManager {
         commandFlow.trySendBlocking(NavigationCommand.PopCommand)
     }
 
-    fun popUpTo(destination: NavDestination, inclusive: Boolean) {
-        commandFlow.trySendBlocking(NavigationCommand.PopUpToCommand(destination, inclusive))
+    fun popBackStack(
+        destination: NavDestination,
+        inclusive: Boolean,
+        saveState: Boolean = false
+    ) {
+        commandFlow.trySendBlocking(
+            NavigationCommand.PopUpToCommand(
+                destination,
+                inclusive,
+                saveState
+            )
+        )
     }
 
-    fun popUpTo(route: String, inclusive: Boolean) {
-        commandFlow.trySendBlocking(NavigationCommand.PopUpToCommand(route, inclusive))
+    fun popBackStack(
+        route: String,
+        inclusive: Boolean,
+        saveState: Boolean = false
+    ) {
+        commandFlow.trySendBlocking(
+            NavigationCommand.PopUpToCommand(
+                route,
+                inclusive,
+                saveState
+            )
+        )
     }
 
-    fun navigate(destination: NavDirection) {
-        commandFlow.trySendBlocking(NavigationCommand.NavigateCommand(destination))
+    fun navigate(
+        destination: NavDirection,
+        navOptions: NavigationOptions? = null
+    ) {
+        commandFlow.trySendBlocking(
+            NavigationCommand.NavigateCommand(
+                destination,
+                navOptions
+            )
+        )
     }
 
-    fun navigate(route: String) {
-        commandFlow.trySendBlocking(NavigationCommand.NavigateCommand(route))
+    fun navigate(
+        direction: NavDirection,
+        builder: NavigationOptionsBuilder.() -> Unit
+    ) {
+        navigate(
+            direction,
+            NavigationOptions(builder)
+        )
+    }
+
+    fun navigate(
+        route: String,
+        navOptions: NavigationOptions? = null
+    ) {
+        commandFlow.trySendBlocking(
+            NavigationCommand.NavigateCommand(
+                route,
+                navOptions
+            )
+        )
+    }
+
+    fun navigate(route: String, builder: NavigationOptionsBuilder.() -> Unit) {
+        navigate(route, NavigationOptions(builder))
     }
 }

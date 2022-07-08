@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import com.gsrocks.compose_easy_route.FourthPageDestination
+import com.gsrocks.compose_easy_route.SecondPageDestination
 import com.gsrocks.compose_easy_route.core.annotation.Destination
 import com.gsrocks.compose_easy_route.core.annotation.ParentBackStackEntry
 import com.gsrocks.compose_easy_route.sample.LocalNavigationProvider
@@ -44,8 +45,14 @@ fun ThirdPage(
                 Text(text = "Set text")
             }
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = { navigator.navigate(FourthPageDestination()) }) {
-                Text(text = "Go to fourth page")
+            Button(
+                onClick = {
+                    navigator.navigate(FourthPageDestination()) {
+                        popUpTo(SecondPageDestination) { inclusive = false }
+                    }
+                }
+            ) {
+                Text(text = "Pop to second and push fourth")
             }
         }
     }

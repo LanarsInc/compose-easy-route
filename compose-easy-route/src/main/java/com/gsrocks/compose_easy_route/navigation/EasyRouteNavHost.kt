@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -25,9 +26,23 @@ fun EasyRouteNavHost(
             when (command) {
                 is NavigationCommand.NavigateCommand -> {
                     if (command.direction.route.isNotEmpty()) {
-                        navController.navigate(
-                            command.direction.route
-                        )
+                        val options = command.navOptions
+                        if (options != null) {
+                            navController.navigate(
+                                route = command.direction.route,
+                                navOptions = NavOptions.Builder()
+                                    .setPopUpTo(
+                                        options.popUpToRoute?.fullRoute,
+                                        inclusive = options.isPopUpToInclusive(),
+                                        saveState = options.shouldPopUpToSaveState()
+                                    )
+                                    .setLaunchSingleTop(options.shouldLaunchSingleTop())
+                                    .setRestoreState(options.shouldRestoreState())
+                                    .build()
+                            )
+                        } else {
+                            navController.navigate(command.direction.route)
+                        }
                     }
                 }
                 is NavigationCommand.PopCommand -> {
@@ -36,10 +51,11 @@ fun EasyRouteNavHost(
                 is NavigationCommand.PopUpToCommand -> {
                     navController.popBackStack(
                         command.route,
-                        inclusive = command.inclusive
+                        inclusive = command.inclusive,
+                        saveState = command.saveState
                     )
                 }
-                else -> {}
+                else -> throw UnsupportedOperationException("Could not handle command $command")
             }
         }
     }

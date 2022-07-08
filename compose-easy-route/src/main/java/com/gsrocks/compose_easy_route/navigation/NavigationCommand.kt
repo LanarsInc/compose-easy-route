@@ -8,19 +8,30 @@ sealed class NavigationCommand {
     object PopCommand : NavigationCommand()
 
     data class PopUpToCommand(
-        val route: String, val inclusive: Boolean
+        val route: String,
+        val inclusive: Boolean,
+        val saveState: Boolean = false
     ) : NavigationCommand() {
-        constructor(destination: NavDestination, inclusive: Boolean) : this(
+        constructor(
+            destination: NavDestination,
+            inclusive: Boolean,
+            saveState: Boolean = false
+        ) : this(
             route = destination.fullRoute,
-            inclusive = inclusive
+            inclusive = inclusive,
+            saveState = saveState
         )
     }
 
-    data class NavigateCommand(val direction: NavDirection) : NavigationCommand() {
-        constructor(route: String) : this(
+    data class NavigateCommand(
+        val direction: NavDirection,
+        val navOptions: NavigationOptions? = null
+    ) : NavigationCommand() {
+        constructor(route: String, navOptions: NavigationOptions? = null) : this(
             object : NavDirection {
                 override val route = route
-            }
+            },
+            navOptions = navOptions
         )
     }
 }
