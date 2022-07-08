@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
                     EasyRouteNavHost(
                         navigationManager = navigationManager,
                         navGraph = NavGraphs.root,
-                        initialRoute = FirstPageDestination.fullRoute
+                        initialRoute = FirstPageDestination()
                     )
                 }
             }
@@ -41,3 +41,6 @@ class MainActivity : ComponentActivity() {
 
 @NavGraph(route = "settings", startRoute = "third-page")
 annotation class SettingsNavGraph()
+
+@NavGraph(route = "login", startRoute = "name-page", parent = SettingsNavGraph::class)
+annotation class LoginNavGraph()

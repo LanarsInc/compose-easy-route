@@ -12,8 +12,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
+import com.gsrocks.compose_easy_route.LoginPageDestination
 import com.gsrocks.compose_easy_route.core.annotation.Destination
 import com.gsrocks.compose_easy_route.core.annotation.ParentBackStackEntry
+import com.gsrocks.compose_easy_route.sample.LocalNavigationProvider
 import com.gsrocks.compose_easy_route.sample.SettingsNavGraph
 
 @SettingsNavGraph
@@ -23,6 +25,7 @@ fun FourthPage(
     @ParentBackStackEntry parentBackStackEntry: NavBackStackEntry
 ) {
     val viewModel = hiltViewModel<SharedViewModel>(parentBackStackEntry)
+    val navigator = LocalNavigationProvider.current
 
     Scaffold { paddingValues ->
         Column(
@@ -39,6 +42,10 @@ fun FourthPage(
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = { viewModel.text = "From fourth" }) {
                 Text(text = "Set text")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = { navigator.navigate(LoginPageDestination())}) {
+                Text(text = "Go to login")
             }
         }
     }

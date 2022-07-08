@@ -9,13 +9,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
+import com.gsrocks.compose_easy_route.core.model.NavDirection
 import kotlinx.coroutines.flow.receiveAsFlow
 
 @Composable
 fun EasyRouteNavHost(
     navigationManager: NavigationManager,
     navGraph: NavigationGraph,
-    initialRoute: String
+    initialRoute: NavDirection
 ) {
     val navController = rememberNavController()
 
@@ -45,7 +46,7 @@ fun EasyRouteNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = initialRoute,
+        startDestination = initialRoute.route,
     ) {
         buildGraphs(navGraph, navController)
     }

@@ -7,4 +7,5 @@ object Constants {
     const val DEEP_LINKS_PARAM = "deepLinks"
     const val ROUTE_PARAM = "route"
     const val START_ROUTE_PARAM = "startRoute"
+    const val PARENT_PARAM = "parent"
 }

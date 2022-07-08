@@ -21,12 +21,12 @@ class DeclarationToDestinationMapper(
 ) {
     fun map(
         composableDestinations: Sequence<KSFunctionDeclaration>,
-        navGraphs: Sequence<NestedGraph>
-    ): List<DestinationWithParams> {
-        return composableDestinations.map { it.toDestination(navGraphs) }.toList()
+        navGraphs: Sequence<NavGraphNode>
+    ): Sequence<DestinationWithParams> {
+        return composableDestinations.map { it.toDestination(navGraphs) }
     }
 
-    private fun KSFunctionDeclaration.toDestination(navGraphs: Sequence<NestedGraph>): DestinationWithParams {
+    private fun KSFunctionDeclaration.toDestination(navGraphs: Sequence<NavGraphNode>): DestinationWithParams {
         val destinationAnnotation = findAnnotation(Destination::class.simpleName!!)
         val routeName =
             destinationAnnotation.findArgumentValue<String>(Constants.ROUTE_NAME_PARAM)!!
@@ -43,7 +43,7 @@ class DeclarationToDestinationMapper(
                 !it.hasAnnotation(ParentBackStackEntry::class.simpleName!!)
             }.map { it.toFunctionParam() },
             deepLinks = deepLinks.map { it.toDeepLink() },
-            nestedGraph = nestedGraph,
+            navGraphNode = nestedGraph,
             backStackEntryParamName = parameters.firstOrNull {
                 it.hasAnnotation(ParentBackStackEntry::class.simpleName!!)
             }?.name?.asString()
@@ -59,14 +59,6 @@ class DeclarationToDestinationMapper(
     }
 
     private fun KSValueParameter.toFunctionParam(): FunctionParameter {
-        /*val hasParentBackStackEntryAnnotation =
-            hasAnnotation(ParentBackStackEntry::class.simpleName!!)
-        val navBackStackEntryType =
-            resolver.getClassDeclarationByName("androidx.navigation.NavBackStackEntry")!!
-                .asType(emptyList())
-        val isBackStackEntry =
-            navBackStackEntryType.isAssignableFrom(it.type.resolve()) && hasParentBackStackEntryAnnotation*/
-
         val resolvedType = type.resolve()
         val resolvedTypeDeclaration = resolvedType.declaration
 
