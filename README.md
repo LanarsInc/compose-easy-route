@@ -7,7 +7,7 @@ To mark a Composable as a destination, use the `@Destination` annotation:
 @Destination(name = "foo-page")
 @Composable
 fun FooPage() {
-    /*  */
+    /* */
 }
 ```
 `@Destination` annotation takes one mandatory parameter:
@@ -53,6 +53,30 @@ navigationManager.navigate(FooPageDestination()) {
 }
 ```
 
+## Navigation arguments
+To declare navigation arguments you can simply add them to the Composable function:
+```kotlin
+@Destination(name = "foo-page")
+@Composable
+fun FooPage(
+    id: Int? = null, // <- this will be an optional navigation argument
+    name: String // <- this will be a mandatory navigation argument
+)
+```
+### Supported types
+- `Int`
+- `Float`
+- `Boolean`
+- `String`
+- `Long`
+- `Serializable`
+- `Parcelable`
+
+**NOTE:** ComposeEasyRoute supports passing `Serializable` and `Parcelable` objects, however this approach is not recommended by Google. The official [documentation](https://developer.android.com/guide/navigation/navigation-pass-data#supported_argument_types) says:
+> Passing complex data structures over arguments is considered an anti-pattern. Each destination should be responsible for loading UI data based on the minimum necessary information, such as item IDs. This simplifies process recreation and avoids potential data inconsistencies.
+
+So you should avoid it as much as you can.
+
 ## Nested graphs
 By default, all your destinations will belong to root `NavigationGraph`. This `NavigationGraph` instance will be generated in an object called `NavGraphs`. So, you can access it via `NavGraphs.root` and you should pass it into `EasyRouteNavHost` call.
 
@@ -72,7 +96,7 @@ To make destinations part of this navigation graph, you need to annotate them wi
 @Destination(name = "foo-page")
 @Composable
 fun FooPage() {
-    /*  */
+    /* */
 }
 ```
 
@@ -89,7 +113,7 @@ annotation class ConfirmationNavGraph
 ### Scoping ViewModel to navigation graph
 Sometimes its useful to scope ViewModel to a specific navigation graph. ComposeEasyRoute provides a way to do that by obtaining parent backstack entry in `Composable` through parameter of type `NavBackStackEntry`, annotated with `@ParentBackStackEntry`, and passing it to `viewModel()` function.
 ```kotlin
-@LoginNavGraph
+@RegistrationNavGraph
 @Destination(name = "foo-page")
 @Composable
 fun FooPage(
@@ -98,8 +122,7 @@ fun FooPage(
     val viewModel = viewModel<SharedViewModel>(parentBackStackEntry)
     // if using Hilt
     val hiltViewModel = hiltViewModel<SharedViewModel>(parentBackStackEntry)
-    
-    /*  */
+    /* */
 }
 ```
 
@@ -114,7 +137,7 @@ You can define deep links to a destination like this:
 )
 @Composable
 fun FooPage(id: Int) {
-    /*  */
+    /* */
 }
 ```
 `EasyRouteDeepLink` also has `action` and `mimeType` parameters. Read more about deep linking in [official documentation](https://developer.android.com/jetpack/compose/navigation#deeplinks).
