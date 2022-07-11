@@ -1,6 +1,13 @@
 # Compose Easy Route 📍
 Jetpack Compose navigation made declarative
 
+- [Defining destinations](#defining-destinations)
+- [Navigation host](#navigation-host)
+- [Navigation](#navigation)
+- [Navigation arguments](#navigation-arguments)
+- [Nested graphs](#nested-graphs)
+- [Deep links](#deep-links)
+
 ## Defining destinations
 To mark a Composable as a destination, use the `@Destination` annotation:
 ```kotlin
