@@ -11,7 +11,7 @@ android {
     compileSdk = Config.compileSdk
 
     defaultConfig {
-        applicationId = "com.gsrocks.compose_easy_route.sample"
+        applicationId = "com.lanars.compose_easy_route.sample"
         minSdk = Config.minSdk
         targetSdk = Config.targetSdk
         versionCode = 1
