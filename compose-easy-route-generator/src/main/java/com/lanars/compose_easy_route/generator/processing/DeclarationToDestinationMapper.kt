@@ -37,13 +37,14 @@ class DeclarationToDestinationMapper(
         val graphAnnotation = nestedGraph?.let { findAnnotation(it.simpleName) }
         val isStart = graphAnnotation?.findArgumentValue<Boolean>(Constants.START_PARAM) ?: false
 
+        val nonAnnotatedParams = parameters.filter {
+            !it.hasAnnotation(ParentBackStackEntry::class.simpleName!!)
+        }
         return DestinationWithParams(
             composableName = simpleName.asString(),
             composableQualifiedName = qualifiedName?.asString() ?: String.empty,
             routeName = routeName,
-            parameters = parameters.filter {
-                !it.hasAnnotation(ParentBackStackEntry::class.simpleName!!)
-            }.map { it.toFunctionParam() },
+            parameters = nonAnnotatedParams.map { it.toFunctionParam() },
             deepLinks = deepLinks.map { it.toDeepLink() },
             navGraphNode = nestedGraph,
             backStackEntryParamName = parameters.firstOrNull {
@@ -55,9 +56,9 @@ class DeclarationToDestinationMapper(
 
     private fun KSAnnotation.toDeepLink(): DeepLink {
         return DeepLink(
-            uriPattern = findArgumentValue("uriPattern")!!,
-            action = findArgumentValue("action")!!,
-            mimeType = findArgumentValue("mimeType")!!,
+            uriPattern = findArgumentValue(Constants.URI_PATTERN_PARAM)!!,
+            action = findArgumentValue(Constants.ACTION_PARAM)!!,
+            mimeType = findArgumentValue(Constants.MIME_TYPE)!!,
         )
     }
 

@@ -8,4 +8,7 @@ object Constants {
     const val ROUTE_PARAM = "route"
     const val PARENT_PARAM = "parent"
     const val START_PARAM = "start"
+    const val URI_PATTERN_PARAM = "uriPattern"
+    const val ACTION_PARAM = "action"
+    const val MIME_TYPE = "mimeType"
 }
