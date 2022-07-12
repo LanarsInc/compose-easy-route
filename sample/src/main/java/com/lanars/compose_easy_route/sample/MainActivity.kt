@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
                     EasyRouteNavHost(
                         navigationManager = navigationManager,
                         navGraph = NavGraphs.root,
-                        initialRoute = FirstPageDestination()
+                        startDirection = FirstPageDestination()
                     )
                 }
             }
@@ -38,8 +38,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@NavGraph(route = "settings", startRoute = "third-page")
-annotation class SettingsNavGraph()
+@NavGraph(route = "settings")
+annotation class SettingsNavGraph(
+    val start: Boolean = false
+)
 
-@NavGraph(route = "login", startRoute = "name-page", parent = SettingsNavGraph::class)
-annotation class LoginNavGraph()
+@NavGraph(route = "login", parent = SettingsNavGraph::class)
+annotation class LoginNavGraph(
+    val start: Boolean = false
+)

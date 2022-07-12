@@ -19,13 +19,11 @@ class DeclarationToNavGraphNodeMapper(
     private fun KSClassDeclaration.toNavGraphNode(): NavGraphNode {
         val navGraphAnnotation = findAnnotation(NavGraph::class.simpleName!!)
         val route = navGraphAnnotation.findArgumentValue<String>(Constants.ROUTE_PARAM)!!
-        val startRoute = navGraphAnnotation.findArgumentValue<String>(Constants.START_ROUTE_PARAM)!!
         val parentClass = navGraphAnnotation.findArgumentValue<KSType>(Constants.PARENT_PARAM)!!
         return NavGraphNode(
             simpleName = simpleName.asString(),
             qualifiedName = qualifiedName!!.asString(),
             route = route,
-            startRoute = startRoute,
             parentQualifiedName = parentClass.declaration.qualifiedName!!.asString()
         )
     }

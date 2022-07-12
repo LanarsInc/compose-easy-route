@@ -9,7 +9,8 @@ data class DestinationWithParams(
     val parameters: List<FunctionParameter>,
     val deepLinks: List<DeepLink>,
     val navGraphNode: NavGraphNode? = null,
-    val backStackEntryParamName: String? = null
+    val backStackEntryParamName: String? = null,
+    val isStart: Boolean = false
 ) {
     val destinationName = composableName + Constants.DESTINATION_NAME_SUFFIX
 

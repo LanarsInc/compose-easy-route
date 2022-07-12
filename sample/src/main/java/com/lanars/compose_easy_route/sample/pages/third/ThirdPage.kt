@@ -19,7 +19,7 @@ import com.lanars.compose_easy_route.core.annotation.ParentBackStackEntry
 import com.lanars.compose_easy_route.sample.LocalNavigationProvider
 import com.lanars.compose_easy_route.sample.SettingsNavGraph
 
-@SettingsNavGraph
+@SettingsNavGraph(start = true)
 @Destination(name = "third-page")
 @Composable
 fun ThirdPage(

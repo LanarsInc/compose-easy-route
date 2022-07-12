@@ -89,17 +89,19 @@ By default, all your destinations will belong to root `NavigationGraph`. This `N
 
 To define a nested graph, you need to create an annotation class annotated with `@NavGraph`. For example:
 ```kotlin
-@NavGraph(route = "registration", startRoute = "name")
-annotation class RegistrationNavGraph
+@NavGraph(route = "registration")
+annotation class RegistrationNavGraph(
+    val start: Boolean = false
+)
 ```
-The `@NavGraph` annotation takes two mandatory parameters:
+Note that `start` parameter is mandatory. It is used to mark destinations as start. Exactly one destination within specific navigation graph must be marked as `start`.
+
+The `@NavGraph` annotation takes one mandatory parameter:
 - `route` - the route of the navigation graph
-- `startRoute` - start route of the navigation graph
-  Navigating to the graph via its route automatically navigates to the graph's start destination.
 
 To make destinations part of this navigation graph, you need to annotate them with it:
 ```kotlin
-@RegistrationNavGraph
+@RegistrationNavGraph(start = true)
 @Destination(name = "foo-page")
 @Composable
 fun FooPage() {
@@ -111,7 +113,6 @@ By default, all nested graphs are children of the root navigation graph. To defi
 ```kotlin
 @NavGraph(
     route = "confirmation",
-    startRoute = "start",
     parent = RegistrationNavGraph::class
 )
 annotation class ConfirmationNavGraph

@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 fun EasyRouteNavHost(
     navigationManager: NavigationManager,
     navGraph: NavigationGraph,
-    initialRoute: NavDirection
+    startDirection: NavDirection
 ) {
     val navController = rememberNavController()
 
@@ -62,7 +62,7 @@ fun EasyRouteNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = initialRoute.route,
+        startDestination = startDirection.route,
     ) {
         buildGraphs(navGraph, navController)
     }

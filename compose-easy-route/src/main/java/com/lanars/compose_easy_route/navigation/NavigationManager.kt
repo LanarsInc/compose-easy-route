@@ -1,5 +1,7 @@
 package com.lanars.compose_easy_route.navigation
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.rememberSaveable
 import com.lanars.compose_easy_route.core.model.NavDirection
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.trySendBlocking
@@ -75,5 +77,12 @@ class NavigationManager {
 
     fun navigate(route: String, builder: NavigationOptionsBuilder.() -> Unit) {
         navigate(route, NavigationOptions(builder))
+    }
+}
+
+@Composable
+fun rememberNavigationManager(): NavigationManager {
+    return rememberSaveable {
+        NavigationManager()
     }
 }

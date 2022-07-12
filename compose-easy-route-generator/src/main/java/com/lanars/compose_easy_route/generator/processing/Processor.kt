@@ -5,6 +5,7 @@ import com.google.devtools.ksp.symbol.*
 import com.lanars.compose_easy_route.core.annotation.Destination
 import com.lanars.compose_easy_route.core.annotation.NavGraph
 import com.lanars.compose_easy_route.core.annotation.RootNavGraph
+import com.lanars.compose_easy_route.core.utils.empty
 import com.lanars.compose_easy_route.generator.generation.MainGenerator
 import com.lanars.compose_easy_route.generator.model.DestinationWithParams
 import com.lanars.compose_easy_route.generator.model.NavGraphInfo
@@ -37,8 +38,7 @@ class Processor(
             simpleName = RootNavGraph::class.simpleName!!,
             qualifiedName = RootNavGraph::class.qualifiedName!!,
             route = "root",
-            startRoute = "",
-            parentQualifiedName = "",
+            parentQualifiedName = String.empty,
             isRoot = true
         )
 
@@ -75,7 +75,7 @@ class Processor(
             route = root.route,
             simpleName = root.simpleName,
             qualifiedName = root.qualifiedName,
-            startRoute = root.startRoute,
+            startRoute = String.empty,
             destinations = destinations.filter { it.navGraphNode == null }.toList(),
             isRoot = true,
             nestedGraphs = processNestedGraphNodes(
@@ -98,12 +98,15 @@ class Processor(
         }
 
         return children.map { node ->
+            val thisGraphsDestinations = destinations.filter { it.navGraphNode == node }.toList()
+            val startRoute = thisGraphsDestinations.singleOrNull { it.isStart }?.routeName
+                ?: throw Exception("Exactly one destination must be marked as start")
             NavGraphInfo(
                 route = node.route,
                 simpleName = node.simpleName,
                 qualifiedName = node.qualifiedName,
-                startRoute = node.startRoute,
-                destinations = destinations.filter { it.navGraphNode == node }.toList(),
+                startRoute = startRoute,
+                destinations = thisGraphsDestinations,
                 isRoot = node.isRoot,
                 nestedGraphs = processNestedGraphNodes(
                     navGraphsNodes = navGraphsNodes,

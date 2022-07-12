@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.sp
 import com.lanars.compose_easy_route.core.annotation.Destination
 import com.lanars.compose_easy_route.sample.LoginNavGraph
 
-@LoginNavGraph
+@LoginNavGraph(start = true)
 @Destination("login-page")
 @Composable
 fun LoginPage() {

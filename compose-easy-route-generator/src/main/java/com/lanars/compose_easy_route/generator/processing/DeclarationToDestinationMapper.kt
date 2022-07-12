@@ -34,6 +34,8 @@ class DeclarationToDestinationMapper(
             destinationAnnotation.findArgumentValue<ArrayList<KSAnnotation>>(Constants.DEEP_LINKS_PARAM)!!
 
         val nestedGraph = navGraphs.firstOrNull { hasAnnotation(it.simpleName) }
+        val graphAnnotation = nestedGraph?.let { findAnnotation(it.simpleName) }
+        val isStart = graphAnnotation?.findArgumentValue<Boolean>(Constants.START_PARAM) ?: false
 
         return DestinationWithParams(
             composableName = simpleName.asString(),
@@ -46,7 +48,8 @@ class DeclarationToDestinationMapper(
             navGraphNode = nestedGraph,
             backStackEntryParamName = parameters.firstOrNull {
                 it.hasAnnotation(ParentBackStackEntry::class.simpleName!!)
-            }?.name?.asString()
+            }?.name?.asString(),
+            isStart = isStart
         )
     }
 
