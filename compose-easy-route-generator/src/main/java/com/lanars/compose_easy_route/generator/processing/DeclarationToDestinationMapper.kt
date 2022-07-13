@@ -71,33 +71,12 @@ class DeclarationToDestinationMapper(
         val resolvedType = type.resolve()
         val resolvedTypeDeclaration = resolvedType.declaration
 
-        var isSerializable = serializableType.isAssignableFrom(resolvedType.makeNotNullable())
-        var isParcelable = parcelableType.isAssignableFrom(resolvedType.makeNotNullable())
-        val isArray =
-            resolvedTypeDeclaration.qualifiedName?.asString() == Array::class.qualifiedName
-        val isEnum = (resolvedTypeDeclaration as? KSClassDeclaration)?.classKind == ClassKind.ENUM_CLASS
-
-        val navType = try {
-            val primitiveNavType = if (isArray) {
-                val genericTypeQualifiedName = resolvedType.getGenericArgumentType()?.qualifiedName
-                genericTypeQualifiedName?.let { NavType.forArrayType(it) }
-                    ?: throw IllegalArgumentException()
-            } else if (isEnum) {
-                NavType.EnumNavType(resolvedTypeDeclaration.simpleName.asString())
-            } else {
-                NavType.forType(resolvedTypeDeclaration.qualifiedName!!.asString())
-            }
-            isSerializable = false
-            isParcelable = false
-            primitiveNavType
-        } catch (e: Exception) {
-            if (isSerializable) {
-                NavType.SerializableNavType(resolvedTypeDeclaration.simpleName.asString())
-            } else if (isParcelable) {
-                NavType.ParcelableNavType(resolvedTypeDeclaration.simpleName.asString())
-            } else {
-                throw e
-            }
+        val navType = when {
+            resolvedType.isPrimitive() -> NavType.forType(resolvedTypeDeclaration.qualifiedName!!.asString())
+            resolvedType.isEnum() -> NavType.EnumNavType(resolvedTypeDeclaration.simpleName.asString())
+            resolvedType.isParcelable() -> NavType.ParcelableNavType(resolvedTypeDeclaration.simpleName.asString())
+            resolvedType.isSerializable() -> NavType.SerializableNavType(resolvedTypeDeclaration.simpleName.asString())
+            else -> throw IllegalArgumentException("Unsupported argument type")
         }
 
         return FunctionParameter(
@@ -106,11 +85,11 @@ class DeclarationToDestinationMapper(
                 simpleName = resolvedTypeDeclaration.simpleName.asString(),
                 qualifiedName = resolvedTypeDeclaration.qualifiedName!!.asString(),
                 navType = navType,
-                isSerializable = isSerializable,
-                isParcelable = isParcelable,
+                isSerializable = resolvedType.isSerializable(),
+                isParcelable = resolvedType.isParcelable(),
                 genericType = resolvedType.getGenericArgumentType(),
                 isNullable = resolvedType.isMarkedNullable,
-                isEnum = isEnum
+                isEnum = resolvedType.isEnum()
             ),
             hasDefault = hasDefault,
             defaultValue = getDefaultValue(resolver),
@@ -128,5 +107,26 @@ class DeclarationToDestinationMapper(
             isParcelable = parcelableType.isAssignableFrom(this),
             isNullable = resolvedType.isMarkedNullable
         )
+    }
+
+    private fun KSType.isPrimitive(): Boolean {
+        return try {
+            NavType.forType(declaration.qualifiedName!!.asString())
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun KSType.isSerializable(): Boolean {
+        return serializableType.isAssignableFrom(this.makeNotNullable())
+    }
+
+    private fun KSType.isParcelable(): Boolean {
+        return parcelableType.isAssignableFrom(this.makeNotNullable())
+    }
+
+    private fun KSType.isEnum(): Boolean {
+        return (declaration as? KSClassDeclaration)?.classKind == ClassKind.ENUM_CLASS
     }
 }
