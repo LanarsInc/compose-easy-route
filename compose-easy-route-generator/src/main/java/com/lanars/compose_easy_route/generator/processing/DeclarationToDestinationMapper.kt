@@ -6,6 +6,7 @@ import com.google.devtools.ksp.processing.Resolver
 import com.google.devtools.ksp.symbol.*
 import com.lanars.compose_easy_route.core.annotation.Destination
 import com.lanars.compose_easy_route.core.annotation.ParentBackStackEntry
+import com.lanars.compose_easy_route.core.exception.UnsupportedNavArgumentType
 import com.lanars.compose_easy_route.core.utils.empty
 import com.lanars.compose_easy_route.generator.constants.Constants
 import com.lanars.compose_easy_route.generator.model.*
@@ -74,9 +75,13 @@ class DeclarationToDestinationMapper(
         val navType = when {
             resolvedType.isPrimitive() -> NavType.forType(resolvedTypeDeclaration.qualifiedName!!.asString())
             resolvedType.isEnum() -> NavType.EnumNavType(resolvedTypeDeclaration.simpleName.asString())
+            resolvedType.isSupportedArray() -> {
+                val genericTypeQualifiedName = resolvedType.getGenericArgumentType()!!.qualifiedName
+                genericTypeQualifiedName.let { NavType.forArrayType(it) }
+            }
             resolvedType.isParcelable() -> NavType.ParcelableNavType(resolvedTypeDeclaration.simpleName.asString())
             resolvedType.isSerializable() -> NavType.SerializableNavType(resolvedTypeDeclaration.simpleName.asString())
-            else -> throw IllegalArgumentException("Unsupported argument type")
+            else -> throw UnsupportedNavArgumentType()
         }
 
         return FunctionParameter(
@@ -128,5 +133,20 @@ class DeclarationToDestinationMapper(
 
     private fun KSType.isEnum(): Boolean {
         return (declaration as? KSClassDeclaration)?.classKind == ClassKind.ENUM_CLASS
+    }
+
+    private fun KSType.isSupportedArray(): Boolean {
+        val isArray = declaration.qualifiedName?.asString() == Array::class.qualifiedName
+        if (isArray) {
+            val genericTypeQualifiedName = getGenericArgumentType()?.qualifiedName
+            return genericTypeQualifiedName?.let {
+                try {
+                    NavType.forArrayType(it)
+                } catch (e: Exception) {
+                    null
+                }
+            } != null
+        }
+        return isArray
     }
 }

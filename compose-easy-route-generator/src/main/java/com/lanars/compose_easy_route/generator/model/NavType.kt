@@ -1,5 +1,6 @@
 package com.lanars.compose_easy_route.generator.model
 
+import com.lanars.compose_easy_route.core.exception.UnsupportedNavArgumentType
 import com.lanars.compose_easy_route.generator.constants.Constants
 
 sealed class NavType(val simpleName: String, val qualifiedName: String) {
@@ -90,7 +91,7 @@ sealed class NavType(val simpleName: String, val qualifiedName: String) {
                 Boolean::class.qualifiedName -> BoolNavType
                 Float::class.qualifiedName -> FloatNavType
                 LongNavType::class.qualifiedName -> LongNavType
-                else -> throw IllegalArgumentException()
+                else -> throw UnsupportedNavArgumentType()
             }
         }
 
@@ -101,7 +102,7 @@ sealed class NavType(val simpleName: String, val qualifiedName: String) {
                 Boolean::class.qualifiedName -> BoolArrayNavType
                 Float::class.qualifiedName -> FloatArrayNavType
                 LongNavType::class.qualifiedName -> LongArrayNavType
-                else -> throw IllegalArgumentException()
+                else -> throw UnsupportedNavArgumentType()
             }
         }
     }
