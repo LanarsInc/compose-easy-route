@@ -73,11 +73,16 @@ fun FooPage(
 ### Supported types
 - `Int`
 - `Float`
+- `Long`
 - `Boolean`
 - `String`
-- `Long`
 - `Serializable`
 - `Parcelable`
+- `IntArray`
+- `FloatArray`
+- `LongArray`
+- `BooleanArray`
+- `Array<String>`
 
 **NOTE:** ComposeEasyRoute supports passing `Serializable` and `Parcelable` objects, however this approach is not recommended by Google. The official [documentation](https://developer.android.com/guide/navigation/navigation-pass-data#supported_argument_types) says:
 > Passing complex data structures over arguments is considered an anti-pattern. Each destination should be responsible for loading UI data based on the minimum necessary information, such as item IDs. This simplifies process recreation and avoids potential data inconsistencies.
