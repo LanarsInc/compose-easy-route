@@ -76,7 +76,6 @@ sealed class NavType(val simpleName: String, val qualifiedName: String) {
             qualifiedName = "${Constants.BASE_PACKAGE_NAME}.navargs.privitives.array.LongArrayNavigationType"
         )
 
-
     class EnumNavType(actualType: String) :
         NavType(
             simpleName = "EnumNavigationType<${actualType}>($actualType::class.java)",
@@ -90,7 +89,7 @@ sealed class NavType(val simpleName: String, val qualifiedName: String) {
                 Int::class.qualifiedName -> IntNavType
                 Boolean::class.qualifiedName -> BoolNavType
                 Float::class.qualifiedName -> FloatNavType
-                LongNavType::class.qualifiedName -> LongNavType
+                Long::class.qualifiedName -> LongNavType
                 else -> throw UnsupportedNavArgumentType()
             }
         }
@@ -101,7 +100,7 @@ sealed class NavType(val simpleName: String, val qualifiedName: String) {
                 Int::class.qualifiedName -> IntArrayNavType
                 Boolean::class.qualifiedName -> BoolArrayNavType
                 Float::class.qualifiedName -> FloatArrayNavType
-                LongNavType::class.qualifiedName -> LongArrayNavType
+                Long::class.qualifiedName -> LongArrayNavType
                 else -> throw UnsupportedNavArgumentType()
             }
         }
