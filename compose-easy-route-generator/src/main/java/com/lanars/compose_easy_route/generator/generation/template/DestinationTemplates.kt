@@ -58,8 +58,7 @@ import ${Constants.BASE_PACKAGE_NAME}.navtype.ParcelableNavType
 import androidx.navigation.navDeepLink
 import ${destination.composableQualifiedName}
 import androidx.navigation.*
-${destination.parameters.joinToString(separator = "\n") { it.type.getImportString() }}
-${getDefaultParametersImports(destination.parameters)}
+${getImports(destination.parameters)}
 
 object ${destination.composableName}Destination : NavDestination {
     override val routeName = "${destination.routeName}"
@@ -85,7 +84,6 @@ object ${destination.composableName}Destination : NavDestination {
         backStackEntry: NavBackStackEntry,
         parentBackStackEntry: NavBackStackEntry
     ) {
-        val arguments = backStackEntry.arguments!!
         ${destination.composableName}(
             ${getContentArgumentsCode(destination.parameters)}
             ${getBackStackEntryCode(destination.backStackEntryParamName)}
@@ -99,7 +97,10 @@ fun getNavArgumentsCode(arguments: List<FunctionParameter>): String {
     return arguments.joinToString(separator = "\n\t\t") {
         var code = "navArgument(\"${it.name}\") { type = ${it.type.navType.simpleName}"
         if (it.hasDefault && it.defaultValue != null) {
-            code += "; defaultValue = ${it.defaultValue.code}"
+            code += "\n\t\t\tdefaultValue = ${it.defaultValue.code}"
+        }
+        if (it.type.isNullable) {
+            code += "\n\t\t\tnullable = true"
         }
         code += " },"
         code
@@ -109,9 +110,9 @@ fun getNavArgumentsCode(arguments: List<FunctionParameter>): String {
 fun getInvokeParamsCode(arguments: List<FunctionParameter>): String {
     return arguments.joinToString(separator = "\n\t\t") {
         if (it.hasDefault && it.defaultValue != null) {
-            "${it.name}: ${it.type.simpleName} = ${it.defaultValue.code},"
+            "${it.name}: ${it.type.getTypeName()} = ${it.defaultValue.code},"
         } else {
-            "${it.name}: ${it.type.simpleName},"
+            "${it.name}: ${it.type.getTypeName()},"
         }
     }
 }
@@ -120,36 +121,31 @@ fun getRouteArgumentsCode(arguments: List<FunctionParameter>): String {
     return arguments.joinToString(separator = "") {
         var argumentRoutePart =
             if (it.hasDefault && it.defaultValue != null) "?${it.name}=" else "/"
-        argumentRoutePart += if (it.type.isSerializable) {
-            "\${${it.type.navType.simpleName}.serializeValue(${it.name})}"
-        } else if (it.type.isParcelable) {
-            "\${${it.type.navType.simpleName}.serializeValue(${it.name})}"
-        } else {
-            "$${it.name}"
-        }
+        /*if (it.type.navType is NavType.IntNavType) {
+            return@joinToString argumentRoutePart + "\${IntNavigationType.serializeValue(${it.name})}"
+        }*/
+        argumentRoutePart += "\${${it.type.navType.simpleName}.serializeValue(${it.name})}"
         argumentRoutePart
     }
 }
 
 fun getContentArgumentsCode(arguments: List<FunctionParameter>): String {
     return arguments.joinToString(separator = "\n\t\t\t") {
-        var arg = "${it.name} = arguments.${it.type.navType.getFunName}(\"${it.name}\")"
-        when (it.type.navType) {
-            is NavType.StringNavType,
-            is NavType.ParcelableNavType -> arg += "!!"
-            else -> {}
-        }
-        if (it.type.isSerializable) {
-            arg += " as ${it.type.simpleName}"
+        var arg = "${it.name} = ${it.type.navType.simpleName}.get(backStackEntry, \"${it.name}\")"
+        if (!it.type.isNullable) {
+            arg += "!!"
         }
         arg += ","
         return@joinToString arg
     }
 }
 
-fun getDefaultParametersImports(arguments: List<FunctionParameter>): String {
-    return arguments.filter { it.hasDefault && it.defaultValue != null }
-        .flatMap { it.defaultValue!!.imports }.joinToString(separator = "\n")
+fun getImports(arguments: List<FunctionParameter>): String {
+    val imports = arguments.filter { it.hasDefault && it.defaultValue != null }
+        .flatMap { it.defaultValue!!.imports }.toMutableList()
+    imports.addAll(arguments.map { "import ${it.type.navType.qualifiedName}" })
+    imports.addAll(arguments.map { it.type.getImportString() })
+    return imports.distinct().joinToString(separator = "\n")
 }
 
 fun getDeepLinksCode(deepLinks: List<DeepLink>): String {

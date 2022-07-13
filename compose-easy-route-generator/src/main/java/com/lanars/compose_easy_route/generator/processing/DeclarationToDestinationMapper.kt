@@ -3,9 +3,7 @@ package com.lanars.compose_easy_route.generator.processing
 import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.processing.KSPLogger
 import com.google.devtools.ksp.processing.Resolver
-import com.google.devtools.ksp.symbol.KSAnnotation
-import com.google.devtools.ksp.symbol.KSFunctionDeclaration
-import com.google.devtools.ksp.symbol.KSValueParameter
+import com.google.devtools.ksp.symbol.*
 import com.lanars.compose_easy_route.core.annotation.Destination
 import com.lanars.compose_easy_route.core.annotation.ParentBackStackEntry
 import com.lanars.compose_easy_route.core.utils.empty
@@ -19,6 +17,13 @@ class DeclarationToDestinationMapper(
     private val resolver: Resolver,
     private val logger: KSPLogger
 ) {
+    private val serializableType by lazy {
+        resolver.getClassDeclarationByName("java.io.Serializable")!!.asType(emptyList())
+    }
+    private val parcelableType by lazy {
+        resolver.getClassDeclarationByName("android.os.Parcelable")!!.asType(emptyList())
+    }
+
     fun map(
         composableDestinations: Sequence<KSFunctionDeclaration>,
         navGraphs: Sequence<NavGraphNode>
@@ -66,17 +71,22 @@ class DeclarationToDestinationMapper(
         val resolvedType = type.resolve()
         val resolvedTypeDeclaration = resolvedType.declaration
 
-        val serializableType =
-            resolver.getClassDeclarationByName("java.io.Serializable")!!.asType(emptyList())
-        val parcelableType =
-            resolver.getClassDeclarationByName("android.os.Parcelable")!!.asType(emptyList())
-
-        var isSerializable = serializableType.isAssignableFrom(resolvedType)
-        var isParcelable = parcelableType.isAssignableFrom(resolvedType)
+        var isSerializable = serializableType.isAssignableFrom(resolvedType.makeNotNullable())
+        var isParcelable = parcelableType.isAssignableFrom(resolvedType.makeNotNullable())
+        val isArray =
+            resolvedTypeDeclaration.qualifiedName?.asString() == Array::class.qualifiedName
+        val isEnum = (resolvedTypeDeclaration as? KSClassDeclaration)?.classKind == ClassKind.ENUM_CLASS
 
         val navType = try {
-            val primitiveNavType =
+            val primitiveNavType = if (isArray) {
+                val genericTypeQualifiedName = resolvedType.getGenericArgumentType()?.qualifiedName
+                genericTypeQualifiedName?.let { NavType.forArrayType(it) }
+                    ?: throw IllegalArgumentException()
+            } else if (isEnum) {
+                NavType.EnumNavType(resolvedTypeDeclaration.simpleName.asString())
+            } else {
                 NavType.forType(resolvedTypeDeclaration.qualifiedName!!.asString())
+            }
             isSerializable = false
             isParcelable = false
             primitiveNavType
@@ -97,10 +107,26 @@ class DeclarationToDestinationMapper(
                 qualifiedName = resolvedTypeDeclaration.qualifiedName!!.asString(),
                 navType = navType,
                 isSerializable = isSerializable,
-                isParcelable = isParcelable
+                isParcelable = isParcelable,
+                genericType = resolvedType.getGenericArgumentType(),
+                isNullable = resolvedType.isMarkedNullable,
+                isEnum = isEnum
             ),
             hasDefault = hasDefault,
             defaultValue = getDefaultValue(resolver),
+        )
+    }
+
+    private fun KSType.getGenericArgumentType(): GenericType? {
+        val typeArgument = arguments.firstOrNull()
+        val resolvedType = typeArgument?.type?.resolve()
+        val resolvedTypeDeclaration = resolvedType?.declaration ?: return null
+        return GenericType(
+            simpleName = resolvedTypeDeclaration.simpleName.asString(),
+            qualifiedName = resolvedTypeDeclaration.qualifiedName!!.asString(),
+            isSerializable = serializableType.isAssignableFrom(this),
+            isParcelable = parcelableType.isAssignableFrom(this),
+            isNullable = resolvedType.isMarkedNullable
         )
     }
 }
