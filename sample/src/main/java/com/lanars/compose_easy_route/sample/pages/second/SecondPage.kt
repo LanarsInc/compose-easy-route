@@ -18,8 +18,10 @@ import com.lanars.compose_easy_route.sample.models.Person
 @Destination("second-page")
 @Composable
 fun SecondPage(
+    number: Int? = null,
     person: Person,
-    number: Int = 56,
+    strings: FloatArray,
+    people: Array<Person>
 ) {
     val navigator = LocalNavigationProvider.current
 
@@ -32,7 +34,7 @@ fun SecondPage(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Hello, ${person.name}! Age: ${person.age}. N: $number",
+                text = "Hello, ${people.joinToString()}. N: $number",
                 style = TextStyle(fontSize = 24.sp)
             )
             Spacer(modifier = Modifier.height(16.dp))

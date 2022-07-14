@@ -1,10 +1,10 @@
 package com.lanars.compose_easy_route.generator.generation.template
 
+import com.lanars.compose_easy_route.core.utils.empty
 import com.lanars.compose_easy_route.generator.constants.Constants
 import com.lanars.compose_easy_route.generator.model.DeepLink
 import com.lanars.compose_easy_route.generator.model.DestinationWithParams
 import com.lanars.compose_easy_route.generator.model.FunctionParameter
-import com.lanars.compose_easy_route.generator.model.NavType
 
 fun getDestinationNoParamsTemplate(destination: DestinationWithParams): String {
     return """
@@ -16,7 +16,7 @@ import androidx.navigation.navDeepLink
 import ${destination.composableQualifiedName}
 import androidx.navigation.*
 import ${Constants.BASE_PACKAGE_NAME}.core.model.NavDirection
-${destination.parameters.joinToString(separator = "\n") { it.type.getImportString() }}
+${getImports(destination.parameters)}
 
 object ${destination.composableName}Destination : NavDestination {
     override val routeName = "${destination.routeName}"
@@ -58,8 +58,7 @@ import ${Constants.BASE_PACKAGE_NAME}.navtype.ParcelableNavType
 import androidx.navigation.navDeepLink
 import ${destination.composableQualifiedName}
 import androidx.navigation.*
-${destination.parameters.joinToString(separator = "\n") { it.type.getImportString() }}
-${getDefaultParametersImports(destination.parameters)}
+${getImports(destination.parameters)}
 
 object ${destination.composableName}Destination : NavDestination {
     override val routeName = "${destination.routeName}"
@@ -76,7 +75,7 @@ object ${destination.composableName}Destination : NavDestination {
         ${getInvokeParamsCode(destination.parameters)}
     ): NavDirection {
         return object : NavDirection {
-            override val route = "${destination.routeName}${getRouteArgumentsCode(destination.parameters)}"
+            override val route = "${destination.routeName}"${getRouteArgumentsCode(destination.parameters)}
         }
     }
     
@@ -85,10 +84,8 @@ object ${destination.composableName}Destination : NavDestination {
         backStackEntry: NavBackStackEntry,
         parentBackStackEntry: NavBackStackEntry
     ) {
-        val arguments = backStackEntry.arguments!!
         ${destination.composableName}(
-            ${getContentArgumentsCode(destination.parameters)}
-            ${getBackStackEntryCode(destination.backStackEntryParamName)}
+            ${getContentArgumentsCode(destination)}
         )
     }
 }
@@ -99,7 +96,10 @@ fun getNavArgumentsCode(arguments: List<FunctionParameter>): String {
     return arguments.joinToString(separator = "\n\t\t") {
         var code = "navArgument(\"${it.name}\") { type = ${it.type.navType.simpleName}"
         if (it.hasDefault && it.defaultValue != null) {
-            code += "; defaultValue = ${it.defaultValue.code}"
+            code += "\n\t\t\tdefaultValue = ${it.defaultValue.code}"
+        }
+        if (it.type.isNullable) {
+            code += "\n\t\t\tnullable = true"
         }
         code += " },"
         code
@@ -109,47 +109,55 @@ fun getNavArgumentsCode(arguments: List<FunctionParameter>): String {
 fun getInvokeParamsCode(arguments: List<FunctionParameter>): String {
     return arguments.joinToString(separator = "\n\t\t") {
         if (it.hasDefault && it.defaultValue != null) {
-            "${it.name}: ${it.type.simpleName} = ${it.defaultValue.code},"
+            "${it.name}: ${it.type.getTypeName()} = ${it.defaultValue.code},"
         } else {
-            "${it.name}: ${it.type.simpleName},"
+            "${it.name}: ${it.type.getTypeName()},"
         }
     }
 }
 
 fun getRouteArgumentsCode(arguments: List<FunctionParameter>): String {
-    return arguments.joinToString(separator = "") {
+    if (arguments.isEmpty()) {
+        return String.empty
+    }
+
+    val separator = " +\n\t\t\t\t"
+    return separator + arguments.joinToString(separator = separator) {
         var argumentRoutePart =
             if (it.hasDefault && it.defaultValue != null) "?${it.name}=" else "/"
-        argumentRoutePart += if (it.type.isSerializable) {
-            "\${${it.type.navType.simpleName}.serializeValue(${it.name})}"
-        } else if (it.type.isParcelable) {
-            "\${${it.type.navType.simpleName}.serializeValue(${it.name})}"
-        } else {
-            "$${it.name}"
-        }
-        argumentRoutePart
+        argumentRoutePart += "\${${it.type.navType.simpleName}.serializeValue(${it.name})}"
+        "\"$argumentRoutePart\""
     }
 }
 
-fun getContentArgumentsCode(arguments: List<FunctionParameter>): String {
-    return arguments.joinToString(separator = "\n\t\t\t") {
-        var arg = "${it.name} = arguments.${it.type.navType.getFunName}(\"${it.name}\")"
-        when (it.type.navType) {
-            is NavType.StringNavType,
-            is NavType.ParcelableNavType -> arg += "!!"
-            else -> {}
-        }
-        if (it.type.isSerializable) {
-            arg += " as ${it.type.simpleName}"
+fun getContentArgumentsCode(destination: DestinationWithParams): String {
+    var code = destination.parameters.joinToString(separator = "\n\t\t\t") {
+        var arg = "${it.name} = ${it.type.navType.simpleName}.get(backStackEntry, \"${it.name}\")"
+        if (!it.type.isNullable) {
+            arg += "!!"
         }
         arg += ","
         return@joinToString arg
     }
+    val backStackEntryCode = getBackStackEntryCode(destination.backStackEntryParamName)
+    if (code.isNotEmpty() && backStackEntryCode.isNotEmpty()) {
+        code += "\n\t\t\t"
+    }
+    code += backStackEntryCode
+    return code
 }
 
-fun getDefaultParametersImports(arguments: List<FunctionParameter>): String {
-    return arguments.filter { it.hasDefault && it.defaultValue != null }
-        .flatMap { it.defaultValue!!.imports }.joinToString(separator = "\n")
+fun getImports(arguments: List<FunctionParameter>): String {
+    val imports = arguments.filter { it.hasDefault && it.defaultValue != null }
+        .flatMap { it.defaultValue!!.imports }.toMutableList()
+    imports.addAll(arguments.map { "import " + it.type.navType.qualifiedName })
+    imports.addAll(arguments.map { "import " + it.type.qualifiedName })
+    imports.addAll(
+        arguments
+            .filter { it.type.genericType != null }
+            .map { "import " + it.type.genericType!!.qualifiedName }
+    )
+    return imports.distinct().joinToString(separator = "\n")
 }
 
 fun getDeepLinksCode(deepLinks: List<DeepLink>): String {
@@ -171,5 +179,5 @@ fun getDeepLinksCode(deepLinks: List<DeepLink>): String {
 fun getBackStackEntryCode(paramName: String?): String {
     if (paramName == null) return ""
 
-    return "$paramName = parentBackStackEntry,"
+    return "$paramName = parentBackStackEntry"
 }
