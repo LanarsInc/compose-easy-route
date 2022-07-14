@@ -82,6 +82,18 @@ sealed class NavType(val simpleName: String, val qualifiedName: String) {
             qualifiedName = "${Constants.BASE_PACKAGE_NAME}.navargs.privitives.EnumNavigationType"
         )
 
+    class SerializableArrayNavType(actualType: String) :
+        NavType(
+            simpleName = "${actualType}ArrayNavigationType",
+            qualifiedName = "${Constants.BASE_PACKAGE_NAME}.${actualType}ArrayNavigationType"
+        )
+
+    class ParcelableArrayNavType(actualType: String) :
+        NavType(
+            simpleName = "${actualType}ArrayNavigationType",
+            qualifiedName = "${Constants.BASE_PACKAGE_NAME}.${actualType}ArrayNavigationType"
+        )
+
     companion object {
         fun forType(qualifiedName: String): NavType {
             return when (qualifiedName) {

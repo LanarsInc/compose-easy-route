@@ -10,14 +10,6 @@ data class ParamType(
     val isNullable: Boolean,
     val isEnum: Boolean
 ) {
-    fun getImportString(): String {
-        if (genericType != null) {
-            return "import $qualifiedName" +
-                    "\nimport ${genericType.qualifiedName}"
-        }
-        return "import $qualifiedName"
-    }
-
     fun getTypeName(): String {
         var name = simpleName
         if (genericType != null) {

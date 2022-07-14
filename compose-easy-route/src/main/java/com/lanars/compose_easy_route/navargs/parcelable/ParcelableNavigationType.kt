@@ -9,7 +9,7 @@ import com.lanars.compose_easy_route.serializer.utils.encodeForRoute
 
 @Suppress("UNCHECKED_CAST")
 class ParcelableNavigationType<T : Parcelable>(
-    private val jClass: Class<out Parcelable>
+    jClass: Class<out Parcelable>
 ) : NavigationType<T>() {
     private val serializer = ParcelableNavTypeSerializer(jClass)
 

@@ -16,7 +16,7 @@ import androidx.navigation.navDeepLink
 import ${destination.composableQualifiedName}
 import androidx.navigation.*
 import ${Constants.BASE_PACKAGE_NAME}.core.model.NavDirection
-${destination.parameters.joinToString(separator = "\n") { it.type.getImportString() }}
+${getImports(destination.parameters)}
 
 object ${destination.composableName}Destination : NavDestination {
     override val routeName = "${destination.routeName}"
@@ -150,8 +150,13 @@ fun getContentArgumentsCode(destination: DestinationWithParams): String {
 fun getImports(arguments: List<FunctionParameter>): String {
     val imports = arguments.filter { it.hasDefault && it.defaultValue != null }
         .flatMap { it.defaultValue!!.imports }.toMutableList()
-    imports.addAll(arguments.map { "import ${it.type.navType.qualifiedName}" })
-    imports.addAll(arguments.map { it.type.getImportString() })
+    imports.addAll(arguments.map { "import " + it.type.navType.qualifiedName })
+    imports.addAll(arguments.map { "import " + it.type.qualifiedName })
+    imports.addAll(
+        arguments
+            .filter { it.type.genericType != null }
+            .map { "import " + it.type.genericType!!.qualifiedName }
+    )
     return imports.distinct().joinToString(separator = "\n")
 }
 

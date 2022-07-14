@@ -75,9 +75,17 @@ class DeclarationToDestinationMapper(
         val navType = when {
             resolvedType.isPrimitive() -> NavType.forType(resolvedTypeDeclaration.qualifiedName!!.asString())
             resolvedType.isEnum() -> NavType.EnumNavType(resolvedTypeDeclaration.simpleName.asString())
-            resolvedType.isSupportedArray() -> {
+            resolvedType.isPrimitiveArray() -> {
                 val genericTypeQualifiedName = resolvedType.getGenericArgumentType()!!.qualifiedName
                 genericTypeQualifiedName.let { NavType.forArrayType(it) }
+            }
+            resolvedType.isParcelableArray() -> {
+                val genericTypeName = resolvedType.getGenericArgumentType()!!.simpleName
+                NavType.ParcelableArrayNavType(genericTypeName)
+            }
+            resolvedType.isSerializableArray() -> {
+                val genericTypeName = resolvedType.getGenericArgumentType()!!.simpleName
+                NavType.SerializableArrayNavType(genericTypeName)
             }
             resolvedType.isParcelable() -> NavType.ParcelableNavType(resolvedTypeDeclaration.simpleName.asString())
             resolvedType.isSerializable() -> NavType.SerializableNavType(resolvedTypeDeclaration.simpleName.asString())
@@ -108,8 +116,8 @@ class DeclarationToDestinationMapper(
         return GenericType(
             simpleName = resolvedTypeDeclaration.simpleName.asString(),
             qualifiedName = resolvedTypeDeclaration.qualifiedName!!.asString(),
-            isSerializable = serializableType.isAssignableFrom(this),
-            isParcelable = parcelableType.isAssignableFrom(this),
+            isSerializable = serializableType.isAssignableFrom(resolvedType),
+            isParcelable = parcelableType.isAssignableFrom(resolvedType),
             isNullable = resolvedType.isMarkedNullable
         )
     }
@@ -135,9 +143,12 @@ class DeclarationToDestinationMapper(
         return (declaration as? KSClassDeclaration)?.classKind == ClassKind.ENUM_CLASS
     }
 
-    private fun KSType.isSupportedArray(): Boolean {
-        val isArray = declaration.qualifiedName?.asString() == Array::class.qualifiedName
-        if (isArray) {
+    private fun KSType.isArray(): Boolean {
+        return declaration.qualifiedName?.asString() == Array::class.qualifiedName
+    }
+
+    private fun KSType.isPrimitiveArray(): Boolean {
+        if (isArray()) {
             val genericTypeQualifiedName = getGenericArgumentType()?.qualifiedName
             return genericTypeQualifiedName?.let {
                 try {
@@ -147,6 +158,22 @@ class DeclarationToDestinationMapper(
                 }
             } != null
         }
-        return isArray
+        return false
+    }
+
+    private fun KSType.isSerializableArray(): Boolean {
+        if (isArray()) {
+            val genericTypeQualifiedName = getGenericArgumentType()
+            return genericTypeQualifiedName?.isSerializable ?: false
+        }
+        return false
+    }
+
+    private fun KSType.isParcelableArray(): Boolean {
+        if (isArray()) {
+            val generic = getGenericArgumentType()
+            return generic?.isParcelable ?: false
+        }
+        return false
     }
 }

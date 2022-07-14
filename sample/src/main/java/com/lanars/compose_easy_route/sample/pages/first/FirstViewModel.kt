@@ -17,7 +17,11 @@ class FirstViewModel @Inject constructor(
             SecondPageDestination(
                 number = 42,
                 person = Person(name = name, age = 45),
-                strings = floatArrayOf(4f, 4f, 866f)
+                strings = floatArrayOf(4f, 4f, 866f),
+                people = arrayOf(
+                    Person(name = "Boris", age = 50),
+                    Person(name = "Jim", age = 23)
+                )
             )
         )
     }
