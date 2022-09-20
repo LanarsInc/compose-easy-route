@@ -28,6 +28,12 @@ subprojects {
                         artifactId = project.name
 
                         afterEvaluate {
+                            if (name != "compose-easy-route-core") {
+                                dependencies.add(
+                                    "implementation",
+                                    "$group:compose-easy-route-core:$version"
+                                )
+                            }
                             if (plugins.hasPlugin("java")) {
                                 from(components["java"])
                             } else if (plugins.hasPlugin("android-library")) {
