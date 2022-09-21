@@ -7,6 +7,7 @@ android {
     compileSdk = Config.compileSdk
 
     defaultConfig {
+        namespace = "com.lanars.compose_easy_route"
         minSdk = Config.minSdk
         targetSdk = Config.targetSdk
 
