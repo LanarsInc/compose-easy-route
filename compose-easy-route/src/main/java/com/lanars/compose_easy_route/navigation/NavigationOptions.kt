@@ -163,6 +163,19 @@ class NavigationOptions internal constructor(
             return this
         }
 
+        /**
+         * Pop up to root destination.
+         *
+         * @param inclusive true to also pop the root destination from the back stack.
+         * @param saveState true if the back stack and the state of all destinations between the
+         * current destination and root should be saved for later restoration via
+         * [setRestoreState] or the `restoreState` attribute using the same ID
+         * as root (note: this matching ID is true whether [inclusive] is true or
+         * false).
+         * @return this Builder
+         *=
+         * @see NavigationOptions.isPopUpToInclusive
+         */
         @JvmOverloads
         fun setPopUntilRoot(
             inclusive: Boolean,
