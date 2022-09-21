@@ -31,7 +31,7 @@ fun EasyRouteNavHost(
                         if (options != null) {
                             navController.navigate(
                                 route = command.direction.route,
-                                navOptions = getNavOptionsBuilder(options, navController)
+                                navOptions = getNavOptions(options, navController)
                             )
                         } else {
                             navController.navigate(command.direction.route)
@@ -61,7 +61,7 @@ fun EasyRouteNavHost(
     }
 }
 
-private fun getNavOptionsBuilder(
+private fun getNavOptions(
     options: NavigationOptions,
     navController: NavController
 ): NavOptions {
