@@ -42,6 +42,8 @@ class NavigationOptionsBuilder {
                 inclusive = false
             }
         }
+    var popUntilRoot: Boolean = false
+        private set
     private var inclusive = false
     private var saveState = false
 
@@ -62,10 +64,21 @@ class NavigationOptionsBuilder {
         saveState = builder.saveState
     }
 
+    fun popUntilRoot(
+        popUpToBuilder: PopUpToBuilder.() -> Unit = {}
+    ) {
+        popUntilRoot = true
+        val builder = PopUpToBuilder().apply(popUpToBuilder)
+        inclusive = builder.inclusive
+        saveState = builder.saveState
+    }
+
     internal fun build() = builder.apply {
         setLaunchSingleTop(launchSingleTop)
         setRestoreState(restoreState)
-        if (popUpToRoute != null) {
+        if (popUntilRoot) {
+            setPopUntilRoot(inclusive, saveState)
+        } else if (popUpToRoute != null) {
             setPopUpTo(popUpToRoute, inclusive, saveState)
         }
     }.build()
