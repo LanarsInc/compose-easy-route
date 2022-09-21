@@ -30,7 +30,7 @@ subprojects {
                         afterEvaluate {
                             if (name != "compose-easy-route-core") {
                                 dependencies.add(
-                                    "implementation",
+                                    "api",
                                     "$group:compose-easy-route-core:$version"
                                 )
                             }
