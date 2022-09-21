@@ -13,6 +13,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.lanars.compose_easy_route.core.model.NavDirection
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
 @Composable
 fun EasyRouteNavHost(
@@ -23,32 +24,39 @@ fun EasyRouteNavHost(
     val navController = rememberNavController()
 
     LaunchedEffect(true) {
-        navigationManager.commandFlow.receiveAsFlow().collect { command ->
-            when (command) {
-                is NavigationCommand.NavigateCommand -> {
-                    if (command.direction.route.isNotEmpty()) {
-                        val options = command.navOptions
-                        if (options != null) {
-                            navController.navigate(
-                                route = command.direction.route,
-                                navOptions = getNavOptions(options, navController)
-                            )
-                        } else {
-                            navController.navigate(command.direction.route)
+        launch {
+            navController.currentBackStackEntryFlow.collect {
+                navigationManager.internalCurrentBackStackEntryFlow.emit(it)
+            }
+        }
+        launch {
+            navigationManager.commandFlow.receiveAsFlow().collect { command ->
+                when (command) {
+                    is NavigationCommand.NavigateCommand -> {
+                        if (command.direction.route.isNotEmpty()) {
+                            val options = command.navOptions
+                            if (options != null) {
+                                navController.navigate(
+                                    route = command.direction.route,
+                                    navOptions = getNavOptions(options, navController)
+                                )
+                            } else {
+                                navController.navigate(command.direction.route)
+                            }
                         }
                     }
+                    is NavigationCommand.PopCommand -> {
+                        navController.popBackStack()
+                    }
+                    is NavigationCommand.PopUpToCommand -> {
+                        navController.popBackStack(
+                            command.route,
+                            inclusive = command.inclusive,
+                            saveState = command.saveState
+                        )
+                    }
+                    else -> throw UnsupportedOperationException("Could not handle command $command")
                 }
-                is NavigationCommand.PopCommand -> {
-                    navController.popBackStack()
-                }
-                is NavigationCommand.PopUpToCommand -> {
-                    navController.popBackStack(
-                        command.route,
-                        inclusive = command.inclusive,
-                        saveState = command.saveState
-                    )
-                }
-                else -> throw UnsupportedOperationException("Could not handle command $command")
             }
         }
     }

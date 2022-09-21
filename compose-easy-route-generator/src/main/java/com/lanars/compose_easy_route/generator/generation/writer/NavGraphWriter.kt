@@ -37,10 +37,8 @@ class NavGraphWriter(
     }
 
     private fun writeNavGraph(navGraph: NavGraphInfo, graphsProperties: MutableList<PropertySpec>) {
-        val visibilityModifier = if (navGraph.isRoot) KModifier.PUBLIC else KModifier.PRIVATE
         graphsProperties.add(
             PropertySpec.builder(navGraph.route, navGraphInterfaceType)
-                .addModifiers(visibilityModifier)
                 .mutable(false)
                 .initializer(getNavGraphCode(navGraph))
                 .build()
