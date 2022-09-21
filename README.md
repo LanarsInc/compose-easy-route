@@ -1,12 +1,29 @@
 # Compose Easy Route 📍
 Jetpack Compose navigation made declarative
 
+- [Download](#download)
 - [Defining destinations](#defining-destinations)
 - [Navigation host](#navigation-host)
 - [Navigation](#navigation)
 - [Navigation arguments](#navigation-arguments)
 - [Nested graphs](#nested-graphs)
 - [Deep links](#deep-links)
+- [Android Studio not indexing generated files](#android-studio-not-indexing-generated-files)
+
+## Download
+```gradle
+repositories {
+    ...
+    maven("https://jitpack.io")
+}
+```
+```gradle
+dependencies {
+    implementation("com.github.LanarsInc.compose-easy-route:compose-easy-route:{version}")
+    implementation("com.github.LanarsInc.compose-easy-route:compose-easy-route-core:{version}")
+    ksp("com.github.LanarsInc.compose-easy-route:compose-easy-route-generator:{version}")
+}
+```
 
 ## Defining destinations
 To mark a Composable as a destination, use the `@Destination` annotation:
@@ -157,3 +174,18 @@ fun FooPage(id: Int) {
 }
 ```
 `EasyRouteDeepLink` also has `action` and `mimeType` parameters. Read more about deep linking in [official documentation](https://developer.android.com/jetpack/compose/navigation#deeplinks).
+
+## Android Studio not indexing generated files
+See KSP related [issue](https://github.com/google/ksp/issues/37).
+
+Fix: put this code inside `android` block.
+```gradle
+applicationVariants.all {
+    kotlin.sourceSets {
+        getByName(name) {
+            kotlin.srcDir("build/generated/ksp/$name/kotlin")
+        }
+    }
+}
+```
+
