@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
@@ -30,15 +31,7 @@ fun EasyRouteNavHost(
                         if (options != null) {
                             navController.navigate(
                                 route = command.direction.route,
-                                navOptions = NavOptions.Builder()
-                                    .setPopUpTo(
-                                        options.popUpToRoute?.fullRoute,
-                                        inclusive = options.isPopUpToInclusive(),
-                                        saveState = options.shouldPopUpToSaveState()
-                                    )
-                                    .setLaunchSingleTop(options.shouldLaunchSingleTop())
-                                    .setRestoreState(options.shouldRestoreState())
-                                    .build()
+                                navOptions = getNavOptionsBuilder(options, navController)
                             )
                         } else {
                             navController.navigate(command.direction.route)
@@ -66,6 +59,29 @@ fun EasyRouteNavHost(
     ) {
         buildGraphs(navGraph, navController)
     }
+}
+
+private fun getNavOptionsBuilder(
+    options: NavigationOptions,
+    navController: NavController
+): NavOptions {
+    val builder = NavOptions.Builder()
+    if (options.popUntilRoot) {
+        builder.setPopUpTo(
+            navController.graph.findStartDestination().id,
+            inclusive = options.isPopUpToInclusive(),
+            saveState = options.shouldPopUpToSaveState()
+        )
+    } else {
+        builder.setPopUpTo(
+            options.popUpToRoute?.fullRoute,
+            inclusive = options.isPopUpToInclusive(),
+            saveState = options.shouldPopUpToSaveState()
+        )
+    }
+    return builder.setLaunchSingleTop(options.shouldLaunchSingleTop())
+        .setRestoreState(options.shouldRestoreState())
+        .build()
 }
 
 fun NavGraphBuilder.buildGraphs(

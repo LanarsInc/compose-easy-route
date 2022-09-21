@@ -30,6 +30,9 @@ class NavigationOptions internal constructor(
     var popUpToRoute: NavDestination? = null
         private set
 
+    var popUntilRoot: Boolean = false
+        private set
+
     /**
      * NavigationOptions stores special options for navigate actions
      */
@@ -39,6 +42,7 @@ class NavigationOptions internal constructor(
         popUpToRoute: NavDestination?,
         popUpToInclusive: Boolean,
         popUpToSaveState: Boolean,
+        popUntilRoot: Boolean = false,
     ) : this(
         singleTop,
         restoreState,
@@ -46,6 +50,7 @@ class NavigationOptions internal constructor(
         popUpToSaveState,
     ) {
         this.popUpToRoute = popUpToRoute
+        this.popUntilRoot = popUntilRoot
     }
 
     /**
@@ -104,6 +109,7 @@ class NavigationOptions internal constructor(
         private var restoreState = false
 
         private var popUpToRoute: NavDestination? = null
+        private var popUntilRoot: Boolean = false
         private var popUpToInclusive = false
         private var popUpToSaveState = false
 
@@ -157,20 +163,37 @@ class NavigationOptions internal constructor(
             return this
         }
 
+        @JvmOverloads
+        fun setPopUntilRoot(
+            inclusive: Boolean,
+            saveState: Boolean = false
+        ): Builder {
+            popUntilRoot = true
+            popUpToInclusive = inclusive
+            popUpToSaveState = saveState
+            return this
+        }
+
         /**
          * @return a constructed NavigationOptions
          */
         fun build(): NavigationOptions {
-            return if (popUpToRoute != null)
+            return if (popUntilRoot) {
+                NavigationOptions(
+                    singleTop, restoreState,
+                    null, popUpToInclusive, popUpToSaveState, true
+                )
+            } else if (popUpToRoute != null) {
                 NavigationOptions(
                     singleTop, restoreState,
                     popUpToRoute, popUpToInclusive, popUpToSaveState,
                 )
-            else
+            } else {
                 NavigationOptions(
                     singleTop, restoreState,
                     popUpToInclusive, popUpToSaveState,
                 )
+            }
         }
     }
 }
