@@ -42,10 +42,10 @@ object Dependencies {
 
     object Plugins {
         const val androidApplication = "com.android.application"
-        const val androidApplicationVersion = "7.2.1"
+        const val androidApplicationVersion = "7.2.2"
 
         const val androidLibrary = "com.android.library"
-        const val androidLibraryVersion = "7.2.1"
+        const val androidLibraryVersion = "7.2.2"
 
         const val kotlinAndroid = "org.jetbrains.kotlin.android"
         const val kotlinVersion = "1.7.0"
@@ -64,6 +64,8 @@ object Dependencies {
         const val hiltAndroid = "dagger.hilt.android.plugin"
 
         const val hiltAndroidGradlePlugin = "com.google.dagger:hilt-android-gradle-plugin:2.42"
+
+        const val mavenPublish = "maven-publish"
     }
 
     object Test {

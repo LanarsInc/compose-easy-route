@@ -7,6 +7,7 @@ android {
     compileSdk = Config.compileSdk
 
     defaultConfig {
+        namespace = "com.lanars.compose_easy_route"
         minSdk = Config.minSdk
         targetSdk = Config.targetSdk
 
@@ -23,6 +24,13 @@ android {
             )
         }
     }
+
+    publishing {
+        publishing {
+            singleVariant("release")
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
