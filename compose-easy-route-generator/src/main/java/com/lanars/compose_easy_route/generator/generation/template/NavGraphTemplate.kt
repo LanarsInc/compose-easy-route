@@ -24,8 +24,9 @@ private fun getDestinationsListCode(destinations: List<DestinationWithParams>): 
 }
 
 private fun getNestedGraphsListCode(navGraphs: List<NavGraphInfo>): String {
-    if (navGraphs.isEmpty()) return String.empty
-    return "\n\t\t" + navGraphs.joinToString(",\n\t\t") {
+    val nonIndependentGraphs = navGraphs.filter { !it.isIndependent }
+    if (nonIndependentGraphs.isEmpty()) return String.empty
+    return "\n\t\t" + nonIndependentGraphs.joinToString(",\n\t\t") {
         it.route.toVariableName()
     } + "\n\t"
 }

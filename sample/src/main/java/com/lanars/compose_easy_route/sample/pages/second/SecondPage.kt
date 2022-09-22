@@ -65,7 +65,5 @@ fun SecondPage(
     }
 }
 
-@NavGraph(route = "bottom-navigation")
-annotation class BottomNavigationNavGraph(
-    val start: Boolean = false
-)
+@NavGraph(route = "bottom-navigation", independent = true)
+annotation class BottomNavigationNavGraph

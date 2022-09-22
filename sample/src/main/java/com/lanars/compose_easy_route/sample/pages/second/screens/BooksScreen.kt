@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.sp
 import com.lanars.compose_easy_route.core.annotation.Destination
 import com.lanars.compose_easy_route.sample.pages.second.BottomNavigationNavGraph
 
-@BottomNavigationNavGraph(start = true)
+@BottomNavigationNavGraph
 @Destination("books")
 @Composable
 fun BooksScreen() {

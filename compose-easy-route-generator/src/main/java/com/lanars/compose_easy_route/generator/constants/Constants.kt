@@ -11,4 +11,5 @@ object Constants {
     const val URI_PATTERN_PARAM = "uriPattern"
     const val ACTION_PARAM = "action"
     const val MIME_TYPE = "mimeType"
+    const val INDEPENDENT_PARAM = "independent"
 }
