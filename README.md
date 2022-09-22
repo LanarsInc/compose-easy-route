@@ -76,6 +76,12 @@ navigationManager.navigate(FooPageDestination()) {
     popUpTo(BarPageDestination) { inclusive = true }
 }
 ```
+Pop the whole back stack
+```kotlin
+navigationManager.navigate(FooPageDestination()) {
+    popUntilRoot { inclusive = true }
+}
+```
 
 ## Navigation arguments
 To declare navigation arguments you can simply add them to the Composable function:
@@ -141,6 +147,34 @@ By default, all nested graphs are children of the root navigation graph. To defi
     parent = RegistrationNavGraph::class
 )
 annotation class ConfirmationNavGraph
+```
+
+### Multiple NavHosts
+Sometimes you want to create another NavHost that is independent from main NavHost (e.g. when implementing bottom navigation or bottom sheet). For that you will need to define a navigation graph, and mark it as `independent`, so ComposeEasyRoute will know that this navigation graph is separate from main navigation graph. Also, for independent graphs we don't need the `start` parameter, because `startDirection` will be passed right into `EasyRouteNavHost`.
+
+**NOTE:** Independent graphs can't be defined as children of other graphs.
+```kotlin
+@NavGraph(
+    route = "bottom-navigation",
+    independent = true
+)
+annotation class BottomNavigationGraph
+```
+```kotlin
+@BottomNavigationNavGraph
+@Destination("books")
+@Composable
+fun BooksScreen() {
+  /* */
+}
+```
+```kotlin
+val navigationManager = remember { NavigationManager() }
+EasyRouteNavHost(
+  navigationManager = navigationManager,
+  navGraph = NavGraphs.bottomNavigation,
+  startDirection = BooksScreenDestination()
+)
 ```
 
 ### Scoping ViewModel to navigation graph
