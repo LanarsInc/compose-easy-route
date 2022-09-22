@@ -1,13 +1,29 @@
 package com.lanars.compose_easy_route.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.navigation.NavBackStackEntry
 import com.lanars.compose_easy_route.core.model.NavDirection
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.*
 
 class NavigationManager {
-    val commandFlow = Channel<NavigationCommand>(Channel.UNLIMITED)
+    internal val commandFlow = Channel<NavigationCommand>(Channel.UNLIMITED)
+
+    internal val internalCurrentBackStackEntryFlow = MutableSharedFlow<NavBackStackEntry>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    ).apply {
+        onEach { currentBackStackEntry = it }
+    }
+    val currentBackStackEntryFlow = internalCurrentBackStackEntryFlow.asSharedFlow()
+
+    var currentBackStackEntry: NavBackStackEntry? = null
+        private set
 
     fun popBackStack() {
         commandFlow.trySendBlocking(NavigationCommand.PopCommand)
@@ -85,4 +101,9 @@ fun rememberNavigationManager(): NavigationManager {
     return rememberSaveable {
         NavigationManager()
     }
+}
+
+@Composable
+fun NavigationManager.currentBackStackEntryAsState(): State<NavBackStackEntry?> {
+    return currentBackStackEntryFlow.collectAsState(null)
 }

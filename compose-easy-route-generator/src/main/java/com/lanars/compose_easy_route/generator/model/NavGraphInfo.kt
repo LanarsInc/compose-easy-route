@@ -7,5 +7,6 @@ data class NavGraphInfo(
     val startRoute: String,
     val destinations: List<DestinationWithParams>,
     val nestedGraphs: List<NavGraphInfo>,
-    val isRoot: Boolean = false
+    val isRoot: Boolean = false,
+    val isIndependent: Boolean = false
 )

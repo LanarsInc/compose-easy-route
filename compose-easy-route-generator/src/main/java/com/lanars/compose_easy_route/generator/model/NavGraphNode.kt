@@ -5,5 +5,6 @@ data class NavGraphNode(
     val qualifiedName: String,
     val route: String,
     val parentQualifiedName: String,
-    val isRoot: Boolean = false
+    val isRoot: Boolean = false,
+    val isIndependent: Boolean = false
 )

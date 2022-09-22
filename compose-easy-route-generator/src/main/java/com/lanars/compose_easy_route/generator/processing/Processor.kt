@@ -82,7 +82,7 @@ class Processor(
                 navGraphsNodes = navGraphsNodes,
                 destinations = destinations,
                 parentQualifiedName = root.qualifiedName
-            )
+            ),
         )
     }
 
@@ -100,19 +100,22 @@ class Processor(
         return children.map { node ->
             val thisGraphsDestinations = destinations.filter { it.navGraphNode == node }.toList()
             val startRoute = thisGraphsDestinations.singleOrNull { it.isStart }?.routeName
-                ?: throw Exception("Exactly one destination must be marked as start")
+            require(node.isIndependent || startRoute != null) {
+                "Exactly one destination must be marked as start"
+            }
             NavGraphInfo(
                 route = node.route,
                 simpleName = node.simpleName,
                 qualifiedName = node.qualifiedName,
-                startRoute = startRoute,
+                startRoute = startRoute ?: String.empty,
                 destinations = thisGraphsDestinations,
                 isRoot = node.isRoot,
                 nestedGraphs = processNestedGraphNodes(
                     navGraphsNodes = navGraphsNodes,
                     destinations = destinations,
                     parentQualifiedName = node.qualifiedName
-                )
+                ),
+                isIndependent = node.isIndependent
             )
         }.toList()
     }
