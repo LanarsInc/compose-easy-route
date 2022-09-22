@@ -59,13 +59,13 @@ fun SecondPage(
     ) {
         EasyRouteNavHost(
             navigationManager = navigationManager,
-            navGraph = NavGraphs.bottom,
+            navGraph = NavGraphs.bottomNavigation,
             startDirection = BooksScreenDestination()
         )
     }
 }
 
-@NavGraph(route = "bottom")
+@NavGraph(route = "bottom-navigation")
 annotation class BottomNavigationNavGraph(
     val start: Boolean = false
 )

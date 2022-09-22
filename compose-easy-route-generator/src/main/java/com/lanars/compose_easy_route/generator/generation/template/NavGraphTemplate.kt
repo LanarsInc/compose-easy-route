@@ -3,6 +3,7 @@ package com.lanars.compose_easy_route.generator.generation.template
 import com.lanars.compose_easy_route.core.utils.empty
 import com.lanars.compose_easy_route.generator.model.DestinationWithParams
 import com.lanars.compose_easy_route.generator.model.NavGraphInfo
+import com.lanars.compose_easy_route.generator.utils.toVariableName
 
 fun getNavGraphCode(navGraphInfo: NavGraphInfo): String {
     return """
@@ -25,6 +26,6 @@ private fun getDestinationsListCode(destinations: List<DestinationWithParams>): 
 private fun getNestedGraphsListCode(navGraphs: List<NavGraphInfo>): String {
     if (navGraphs.isEmpty()) return String.empty
     return "\n\t\t" + navGraphs.joinToString(",\n\t\t") {
-        it.route
+        it.route.toVariableName()
     } + "\n\t"
 }

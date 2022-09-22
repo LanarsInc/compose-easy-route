@@ -6,6 +6,7 @@ import com.google.devtools.ksp.processing.KSPLogger
 import com.lanars.compose_easy_route.generator.constants.Constants
 import com.lanars.compose_easy_route.generator.generation.template.getNavGraphCode
 import com.lanars.compose_easy_route.generator.model.NavGraphInfo
+import com.lanars.compose_easy_route.generator.utils.toVariableName
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ksp.writeTo
 
@@ -38,7 +39,7 @@ class NavGraphWriter(
 
     private fun writeNavGraph(navGraph: NavGraphInfo, graphsProperties: MutableList<PropertySpec>) {
         graphsProperties.add(
-            PropertySpec.builder(navGraph.route, navGraphInterfaceType)
+            PropertySpec.builder(navGraph.route.toVariableName(), navGraphInterfaceType)
                 .mutable(false)
                 .initializer(getNavGraphCode(navGraph))
                 .build()
