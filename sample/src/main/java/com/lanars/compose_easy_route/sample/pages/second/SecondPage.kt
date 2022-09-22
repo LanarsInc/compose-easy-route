@@ -1,17 +1,12 @@
 package com.lanars.compose_easy_route.sample.pages.second
 
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.lanars.compose_easy_route.BooksScreenDestination
-import com.lanars.compose_easy_route.FirstPageDestination
 import com.lanars.compose_easy_route.NavGraphs
-import com.lanars.compose_easy_route.ProfileScreenDestination
 import com.lanars.compose_easy_route.core.annotation.Destination
 import com.lanars.compose_easy_route.core.annotation.NavGraph
 import com.lanars.compose_easy_route.navigation.EasyRouteNavHost
@@ -42,14 +37,14 @@ fun SecondPage(
                 val currentDestination = navBackStackEntry?.destination
                 items.forEach { screen ->
                     val selected = currentDestination?.hierarchy?.any {
-                        it.route == screen.destination.fullRoute
+                        it.route == screen.direction.route
                     } == true
                     BottomNavigationItem(
                         icon = { Icon(screen.icon, contentDescription = screen.icon.name) },
                         label = { Text(screen.title) },
                         selected = selected,
                         onClick = {
-                            navigationManager.navigate(screen.destination.fullRoute) {
+                            navigationManager.navigate(screen.direction) {
                                 popUntilRoot {
                                     saveState = true
                                 }
