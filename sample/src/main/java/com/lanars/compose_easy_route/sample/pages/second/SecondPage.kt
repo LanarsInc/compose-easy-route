@@ -1,18 +1,17 @@
 package com.lanars.compose_easy_route.sample.pages.second
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.lanars.compose_easy_route.ThirdPageDestination
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.navigation.NavDestination.Companion.hierarchy
+import com.lanars.compose_easy_route.BooksScreenDestination
+import com.lanars.compose_easy_route.NavGraphs
 import com.lanars.compose_easy_route.core.annotation.Destination
-import com.lanars.compose_easy_route.sample.LocalNavigationProvider
+import com.lanars.compose_easy_route.core.annotation.NavGraph
+import com.lanars.compose_easy_route.navigation.EasyRouteNavHost
+import com.lanars.compose_easy_route.navigation.NavigationManager
+import com.lanars.compose_easy_route.navigation.currentBackStackEntryAsState
 import com.lanars.compose_easy_route.sample.models.Person
 
 @Destination("second-page")
@@ -23,28 +22,48 @@ fun SecondPage(
     strings: FloatArray,
     people: Array<Person>
 ) {
-    val navigator = LocalNavigationProvider.current
+    val items = listOf(
+        Screen.Books,
+        Screen.Profile,
+        Screen.FriendsList,
+    )
 
-    Scaffold { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Hello, ${people.joinToString()}. N: $number",
-                style = TextStyle(fontSize = 24.sp)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = {
-                    navigator.navigate(ThirdPageDestination())
+    val navigationManager = remember { NavigationManager() }
+
+    Scaffold(
+        bottomBar = {
+            BottomNavigation {
+                val navBackStackEntry by navigationManager.currentBackStackEntryAsState()
+                val currentDestination = navBackStackEntry?.destination
+                items.forEach { screen ->
+                    val selected = currentDestination?.hierarchy?.any {
+                        it.route == screen.direction.route
+                    } == true
+                    BottomNavigationItem(
+                        icon = { Icon(screen.icon, contentDescription = screen.icon.name) },
+                        label = { Text(screen.title) },
+                        selected = selected,
+                        onClick = {
+                            navigationManager.navigate(screen.direction) {
+                                popUntilRoot {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
                 }
-            ) {
-                Text(text = "Go to nested")
             }
         }
+    ) {
+        EasyRouteNavHost(
+            navigationManager = navigationManager,
+            navGraph = NavGraphs.bottomNavigation,
+            startDirection = BooksScreenDestination()
+        )
     }
 }
+
+@NavGraph(route = "bottom-navigation", independent = true)
+annotation class BottomNavigationNavGraph
