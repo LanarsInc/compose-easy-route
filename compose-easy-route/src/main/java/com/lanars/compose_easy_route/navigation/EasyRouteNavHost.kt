@@ -28,7 +28,11 @@ fun EasyRouteNavHost(
     LaunchedEffect(true) {
         launch {
             navController.currentBackStackEntryFlow.collect {
-                navigationManager.internalCurrentBackStackEntryFlow.emit(it)
+                navigationManager.apply {
+                    internalCurrentBackStackEntryFlow.emit(it)
+                    currentBackStackEntry = it
+                    previousBackStackEntry = navController.previousBackStackEntry
+                }
             }
         }
         launch {
@@ -56,6 +60,15 @@ fun EasyRouteNavHost(
                             inclusive = command.inclusive,
                             saveState = command.saveState
                         )
+                    }
+                    is NavigationCommand.SetResult<*> -> {
+                        val backStackEntry = if (command.destination == null) {
+                            navController.previousBackStackEntry
+                        } else {
+                            navController.getBackStackEntry(command.destination.fullRoute)
+                        }
+
+                        backStackEntry?.savedStateHandle?.set(command.key, command.value)
                     }
                     else -> throw UnsupportedOperationException("Could not handle command $command")
                 }

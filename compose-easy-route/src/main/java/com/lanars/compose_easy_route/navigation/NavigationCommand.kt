@@ -34,4 +34,10 @@ sealed class NavigationCommand {
             navOptions = navOptions
         )
     }
+
+    data class SetResult<T>(
+        val destination: NavDestination? = null,
+        val key: String,
+        val value: T
+    ) : NavigationCommand()
 }

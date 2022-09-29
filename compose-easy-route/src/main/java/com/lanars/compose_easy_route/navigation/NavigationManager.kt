@@ -17,13 +17,14 @@ class NavigationManager {
     internal val internalCurrentBackStackEntryFlow = MutableSharedFlow<NavBackStackEntry>(
         replay = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST
-    ).apply {
-        onEach { currentBackStackEntry = it }
-    }
+    )
     val currentBackStackEntryFlow = internalCurrentBackStackEntryFlow.asSharedFlow()
 
     var currentBackStackEntry: NavBackStackEntry? = null
-        private set
+        internal set
+
+    var previousBackStackEntry: NavBackStackEntry? = null
+        internal set
 
     fun popBackStack() {
         commandFlow.trySendBlocking(NavigationCommand.PopCommand)
@@ -94,6 +95,25 @@ class NavigationManager {
     fun navigate(route: String, builder: NavigationOptionsBuilder.() -> Unit) {
         navigate(route, NavigationOptions(builder))
     }
+
+    fun <T> setResult(key: String, value: T) {
+        commandFlow.trySendBlocking(
+            NavigationCommand.SetResult(
+                key = key,
+                value = value
+            )
+        )
+    }
+
+    fun <T> setResult(destination: NavDestination, key: String, value: T) {
+        commandFlow.trySendBlocking(
+            NavigationCommand.SetResult(
+                destination = destination,
+                key = key,
+                value = value
+            )
+        )
+    }
 }
 
 @Composable
@@ -104,4 +124,15 @@ fun rememberNavigationManager(): NavigationManager {
 @Composable
 fun NavigationManager.currentBackStackEntryAsState(): State<NavBackStackEntry?> {
     return currentBackStackEntryFlow.collectAsState(null)
+}
+
+suspend fun <T> NavigationManager.currentSaveStateHandleStateFlow(
+    key: String,
+    initialValue: T,
+    collector: FlowCollector<T>
+) {
+    currentBackStackEntry?.savedStateHandle?.getStateFlow(
+        key,
+        initialValue
+    )?.collect(collector)
 }
