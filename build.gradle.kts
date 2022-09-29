@@ -14,7 +14,7 @@ plugins {
 
 allprojects {
     group = "com.lanars"
-    version = "1.2.1"
+    version = "1.2.2"
 }
 
 subprojects {

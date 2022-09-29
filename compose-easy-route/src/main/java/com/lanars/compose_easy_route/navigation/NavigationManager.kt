@@ -3,7 +3,7 @@ package com.lanars.compose_easy_route.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavBackStackEntry
 import com.lanars.compose_easy_route.core.model.NavDirection
 import kotlinx.coroutines.channels.BufferOverflow
@@ -98,9 +98,7 @@ class NavigationManager {
 
 @Composable
 fun rememberNavigationManager(): NavigationManager {
-    return rememberSaveable {
-        NavigationManager()
-    }
+    return remember { NavigationManager() }
 }
 
 @Composable

@@ -97,8 +97,10 @@ class Processor(
             return emptyList()
         }
 
-        return children.map { node ->
+        return children.mapNotNull { node ->
             val thisGraphsDestinations = destinations.filter { it.navGraphNode == node }.toList()
+            if (thisGraphsDestinations.isEmpty()) return@mapNotNull null
+
             val startRoute = thisGraphsDestinations.singleOrNull { it.isStart }?.routeName
             require(node.isIndependent || startRoute != null) {
                 "Exactly one destination must be marked as start"
