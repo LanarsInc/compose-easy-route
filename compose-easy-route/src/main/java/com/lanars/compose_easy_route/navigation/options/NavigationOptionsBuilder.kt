@@ -1,4 +1,6 @@
-package com.lanars.compose_easy_route.navigation
+package com.lanars.compose_easy_route.navigation.options
+
+import com.lanars.compose_easy_route.navigation.NavDestination
 
 /**
  * Construct a new [NavigationOptions]

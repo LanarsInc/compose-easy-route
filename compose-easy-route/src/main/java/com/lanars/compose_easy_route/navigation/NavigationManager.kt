@@ -6,7 +6,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.navigation.NavBackStackEntry
 import com.lanars.compose_easy_route.core.model.NavDirection
-import kotlinx.coroutines.channels.BufferOverflow
+import com.lanars.compose_easy_route.navigation.options.NavigationOptions
+import com.lanars.compose_easy_route.navigation.options.NavigationOptionsBuilder
+import com.lanars.compose_easy_route.navigation.options.PopOptions
+import com.lanars.compose_easy_route.navigation.options.PopOptionsBuilder
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.*
@@ -14,10 +17,7 @@ import kotlinx.coroutines.flow.*
 class NavigationManager {
     internal val commandFlow = Channel<NavigationCommand>(Channel.UNLIMITED)
 
-    internal val internalCurrentBackStackEntryFlow = MutableSharedFlow<NavBackStackEntry>(
-        replay = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
+    internal val internalCurrentBackStackEntryFlow = MutableSharedFlow<NavBackStackEntry>()
     val currentBackStackEntryFlow = internalCurrentBackStackEntryFlow.asSharedFlow()
 
     var currentBackStackEntry: NavBackStackEntry? = null
@@ -26,20 +26,26 @@ class NavigationManager {
     var previousBackStackEntry: NavBackStackEntry? = null
         internal set
 
-    fun popBackStack() {
-        commandFlow.trySendBlocking(NavigationCommand.PopCommand)
+    fun popBackStack(
+        builder: PopOptionsBuilder.() -> Unit = {}
+    ) {
+        commandFlow.trySendBlocking(
+            NavigationCommand.PopCommand(PopOptions(builder))
+        )
     }
 
     fun popBackStack(
         destination: NavDestination,
         inclusive: Boolean,
-        saveState: Boolean = false
+        saveState: Boolean = false,
+        builder: PopOptionsBuilder.() -> Unit = {}
     ) {
         commandFlow.trySendBlocking(
             NavigationCommand.PopUpToCommand(
                 destination,
                 inclusive,
-                saveState
+                saveState,
+                PopOptions(builder)
             )
         )
     }
@@ -47,24 +53,26 @@ class NavigationManager {
     fun popBackStack(
         route: String,
         inclusive: Boolean,
-        saveState: Boolean = false
+        saveState: Boolean = false,
+        builder: PopOptionsBuilder.() -> Unit = {}
     ) {
         commandFlow.trySendBlocking(
             NavigationCommand.PopUpToCommand(
                 route,
                 inclusive,
-                saveState
+                saveState,
+                PopOptions(builder)
             )
         )
     }
 
     fun navigate(
-        destination: NavDirection,
+        direction: NavDirection,
         navOptions: NavigationOptions? = null
     ) {
         commandFlow.trySendBlocking(
             NavigationCommand.NavigateCommand(
-                destination,
+                direction,
                 navOptions
             )
         )
@@ -92,27 +100,11 @@ class NavigationManager {
         )
     }
 
-    fun navigate(route: String, builder: NavigationOptionsBuilder.() -> Unit) {
+    fun navigate(
+        route: String,
+        builder: NavigationOptionsBuilder.() -> Unit
+    ) {
         navigate(route, NavigationOptions(builder))
-    }
-
-    fun <T> setResult(key: String, value: T) {
-        commandFlow.trySendBlocking(
-            NavigationCommand.SetResult(
-                key = key,
-                value = value
-            )
-        )
-    }
-
-    fun <T> setResult(destination: NavDestination, key: String, value: T) {
-        commandFlow.trySendBlocking(
-            NavigationCommand.SetResult(
-                destination = destination,
-                key = key,
-                value = value
-            )
-        )
     }
 }
 
@@ -126,13 +118,16 @@ fun NavigationManager.currentBackStackEntryAsState(): State<NavBackStackEntry?> 
     return currentBackStackEntryFlow.collectAsState(null)
 }
 
-suspend fun <T> NavigationManager.currentSaveStateHandleStateFlow(
+suspend fun <T> NavBackStackEntry.collectResult(
     key: String,
     initialValue: T,
     collector: FlowCollector<T>
 ) {
-    currentBackStackEntry?.savedStateHandle?.getStateFlow(
+    savedStateHandle.getStateFlow(
         key,
         initialValue
-    )?.collect(collector)
+    ).collect {
+        collector.emit(it)
+        savedStateHandle.remove<T>(key)
+    }
 }

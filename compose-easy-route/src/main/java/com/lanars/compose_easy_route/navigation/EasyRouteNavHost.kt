@@ -13,6 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.lanars.compose_easy_route.core.model.NavDirection
+import com.lanars.compose_easy_route.navigation.options.NavigationOptions
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -52,14 +53,24 @@ fun EasyRouteNavHost(
                         }
                     }
                     is NavigationCommand.PopCommand -> {
-                        navController.popBackStack()
+                        with(navController) {
+                            command.popOptions?.navigationResult?.let {
+                                previousBackStackEntry?.savedStateHandle?.set(it.key, it.value)
+                            }
+                            popBackStack()
+                        }
                     }
                     is NavigationCommand.PopUpToCommand -> {
-                        navController.popBackStack(
-                            command.route,
-                            inclusive = command.inclusive,
-                            saveState = command.saveState
-                        )
+                        with(navController) {
+                            command.popOptions?.navigationResult?.let {
+                                getBackStackEntry(command.route).savedStateHandle[it.key] = it.value
+                            }
+                            navController.popBackStack(
+                                command.route,
+                                inclusive = command.inclusive,
+                                saveState = command.saveState
+                            )
+                        }
                     }
                     is NavigationCommand.SetResult<*> -> {
                         val backStackEntry = if (command.destination == null) {

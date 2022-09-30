@@ -1,25 +1,32 @@
 package com.lanars.compose_easy_route.navigation
 
 import com.lanars.compose_easy_route.core.model.NavDirection
+import com.lanars.compose_easy_route.navigation.options.NavigationOptions
+import com.lanars.compose_easy_route.navigation.options.PopOptions
 
 sealed class NavigationCommand {
     object Default : NavigationCommand()
 
-    object PopCommand : NavigationCommand()
+    data class PopCommand(
+        val popOptions: PopOptions? = null
+    ) : NavigationCommand()
 
     data class PopUpToCommand(
         val route: String,
         val inclusive: Boolean,
-        val saveState: Boolean = false
+        val saveState: Boolean = false,
+        val popOptions: PopOptions? = null
     ) : NavigationCommand() {
         constructor(
             destination: NavDestination,
             inclusive: Boolean,
-            saveState: Boolean = false
+            saveState: Boolean = false,
+            popOptions: PopOptions? = null
         ) : this(
             route = destination.fullRoute,
             inclusive = inclusive,
-            saveState = saveState
+            saveState = saveState,
+            popOptions = popOptions
         )
     }
 
