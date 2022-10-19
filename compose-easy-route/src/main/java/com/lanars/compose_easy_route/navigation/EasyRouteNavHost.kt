@@ -5,7 +5,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
@@ -103,7 +102,7 @@ private fun getNavOptions(
     val builder = NavOptions.Builder()
     if (options.popUntilRoot) {
         builder.setPopUpTo(
-            navController.graph.findStartDestination().id,
+            navController.backQueue.first().destination.id,
             inclusive = options.isPopUpToInclusive(),
             saveState = options.shouldPopUpToSaveState()
         )
