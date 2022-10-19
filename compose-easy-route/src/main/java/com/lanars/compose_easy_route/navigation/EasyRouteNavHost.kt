@@ -5,7 +5,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
@@ -13,6 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.lanars.compose_easy_route.core.model.NavDirection
+import com.lanars.compose_easy_route.navigation.options.NavigationOptions
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -28,7 +28,11 @@ fun EasyRouteNavHost(
     LaunchedEffect(true) {
         launch {
             navController.currentBackStackEntryFlow.collect {
-                navigationManager.internalCurrentBackStackEntryFlow.emit(it)
+                navigationManager.apply {
+                    internalCurrentBackStackEntryFlow.emit(it)
+                    currentBackStackEntry = it
+                    previousBackStackEntry = navController.previousBackStackEntry
+                }
             }
         }
         launch {
@@ -48,14 +52,33 @@ fun EasyRouteNavHost(
                         }
                     }
                     is NavigationCommand.PopCommand -> {
-                        navController.popBackStack()
+                        with(navController) {
+                            command.popOptions?.navigationResult?.let {
+                                previousBackStackEntry?.savedStateHandle?.set(it.key, it.value)
+                            }
+                            popBackStack()
+                        }
                     }
                     is NavigationCommand.PopUpToCommand -> {
-                        navController.popBackStack(
-                            command.route,
-                            inclusive = command.inclusive,
-                            saveState = command.saveState
-                        )
+                        with(navController) {
+                            command.popOptions?.navigationResult?.let {
+                                getBackStackEntry(command.route).savedStateHandle[it.key] = it.value
+                            }
+                            navController.popBackStack(
+                                command.route,
+                                inclusive = command.inclusive,
+                                saveState = command.saveState
+                            )
+                        }
+                    }
+                    is NavigationCommand.SetResult<*> -> {
+                        val backStackEntry = if (command.destination == null) {
+                            navController.previousBackStackEntry
+                        } else {
+                            navController.getBackStackEntry(command.destination.fullRoute)
+                        }
+
+                        backStackEntry?.savedStateHandle?.set(command.key, command.value)
                     }
                     else -> throw UnsupportedOperationException("Could not handle command $command")
                 }
@@ -79,7 +102,7 @@ private fun getNavOptions(
     val builder = NavOptions.Builder()
     if (options.popUntilRoot) {
         builder.setPopUpTo(
-            navController.graph.findStartDestination().id,
+            navController.backQueue.first().destination.id,
             inclusive = options.isPopUpToInclusive(),
             saveState = options.shouldPopUpToSaveState()
         )
