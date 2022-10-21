@@ -102,7 +102,7 @@ private fun getNavOptions(
     val builder = NavOptions.Builder()
     if (options.popUntilRoot) {
         builder.setPopUpTo(
-            navController.backQueue.first().destination.id,
+            navController.backQueue[1].destination.id,
             inclusive = options.isPopUpToInclusive(),
             saveState = options.shouldPopUpToSaveState()
         )
