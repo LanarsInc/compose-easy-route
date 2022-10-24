@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
                     EasyRouteNavHost(
                         navigationManager = navigationManager,
                         navGraph = NavGraphs.root,
-                        startDirection = FirstPageDestination()
+                        startDestination = FirstPageDestination
                     )
                 }
             }

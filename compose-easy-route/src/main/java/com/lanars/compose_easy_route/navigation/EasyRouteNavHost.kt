@@ -11,7 +11,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
-import com.lanars.compose_easy_route.core.model.NavDirection
 import com.lanars.compose_easy_route.navigation.options.NavigationOptions
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
@@ -20,7 +19,7 @@ import kotlinx.coroutines.launch
 fun EasyRouteNavHost(
     navigationManager: NavigationManager,
     navGraph: NavigationGraph,
-    startDirection: NavDirection,
+    startDestination: NavDestination,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -88,7 +87,7 @@ fun EasyRouteNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = startDirection.route,
+        startDestination = startDestination.fullRoute,
         modifier = modifier
     ) {
         buildGraphs(navGraph, navController)
