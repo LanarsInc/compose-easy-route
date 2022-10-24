@@ -6,6 +6,7 @@ Jetpack Compose navigation made declarative
 - [Navigation host](#navigation-host)
 - [Navigation](#navigation)
 - [Navigation arguments](#navigation-arguments)
+- [Return result](#return-result)
 - [Nested graphs](#nested-graphs)
 - [Deep links](#deep-links)
 - [Android Studio not indexing generated files](#android-studio-not-indexing-generated-files)
@@ -42,15 +43,16 @@ fun FooPage() {
 `EasyRouteNavHost` has three mandatory parameters:
 - `navigationManager` - used for sending navigation commands to `EasyRouteNavHost`
 - `navGraph` - generated `NavigationGraph` object from `NavGraphs` object
-- `startDirection` - initial direction
+- `startDestination` - initial destination
 ```kotlin
 val navigationManager = rememberNavigationManager()
 EasyRouteNavHost(
     navigationManager = navigationManager,
     navGraph = NavGraphs.root,
-    startDirection = FirstPageDestination()
+    startDestination = FirstPageDestination
 )
 ```
+**NOTE:** Destination can only be used as start if it doesn't have parameters, or has only optional parameters.
 
 ## Navigation
 ComposeEasyRoute navigation API is similar to original Compose Navigation's.
@@ -115,6 +117,40 @@ fun FooPage(
 
 So you should avoid it as much as you can.
 
+## Return result
+To return the result to the previous screen use `popBackStack` with `withResult` function.
+```kotlin
+navigationManager.popBackStack {
+	withResult(
+		key = "key",
+		value = value
+	)
+}
+```
+On the screen to where you return the result, observe the result in this way:
+```kotlin
+LaunchedEffect(true) {
+	navigationManager.currentBackStackEntry?.collectResult<YourResultType?>(
+		key = "key",
+		initialValue = null
+	) { result ->
+		// process the result
+	}
+}
+```
+You can return the result not only to the previous screen, but to any destinnation in back stack.
+```kotlin
+navigationManager.popBackStack(
+	destination = FooPageDestination,
+	inclusive = false
+) {
+	withResult(
+		key = "key",
+		value = value
+	)
+}
+```
+
 ## Nested graphs
 By default, all your destinations will belong to root `NavigationGraph`. This `NavigationGraph` instance will be generated in an object called `NavGraphs`. So, you can access it via `NavGraphs.root` and you should pass it into `EasyRouteNavHost` call.
 
@@ -150,7 +186,7 @@ annotation class ConfirmationNavGraph
 ```
 
 ### Multiple NavHosts
-Sometimes you want to create another NavHost that is independent from main NavHost (e.g. when implementing bottom navigation or bottom sheet). For that you will need to define a navigation graph, and mark it as `independent`, so ComposeEasyRoute will know that this navigation graph is separate from main navigation graph. Also, for independent graphs we don't need the `start` parameter, because `startDirection` will be passed right into `EasyRouteNavHost`.
+Sometimes you want to create another NavHost that is independent from main NavHost (e.g. when implementing bottom navigation or bottom sheet). For that you will need to define a navigation graph, and mark it as `independent`, so ComposeEasyRoute will know that this navigation graph is separate from main navigation graph. Also, for independent graphs we don't need the `start` parameter, because `startDestination` will be passed right into `EasyRouteNavHost`.
 
 **NOTE:** Independent graphs can't be defined as children of other graphs.
 ```kotlin
@@ -165,15 +201,15 @@ annotation class BottomNavigationGraph
 @Destination("books")
 @Composable
 fun BooksScreen() {
-  /* */
+    /* */
 }
 ```
 ```kotlin
 val navigationManager = remember { NavigationManager() }
 EasyRouteNavHost(
-  navigationManager = navigationManager,
-  navGraph = NavGraphs.bottomNavigation,
-  startDirection = BooksScreenDestination()
+    navigationManager = navigationManager,
+    navGraph = NavGraphs.bottomNavigation, 
+    startDestination = BooksScreenDestination
 )
 ```
 
@@ -222,4 +258,3 @@ applicationVariants.all {
     }
 }
 ```
-
