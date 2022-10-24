@@ -60,7 +60,7 @@ fun SecondPage(
         EasyRouteNavHost(
             navigationManager = navigationManager,
             navGraph = NavGraphs.bottomNavigation,
-            startDirection = BooksScreenDestination()
+            startDestination = BooksScreenDestination
         )
     }
 }
