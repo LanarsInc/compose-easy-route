@@ -121,33 +121,33 @@ So you should avoid it as much as you can.
 To return the result to the previous screen use `popBackStack` with `withResult` function.
 ```kotlin
 navigationManager.popBackStack {
-	withResult(
-		key = "key",
-		value = value
-	)
+    withResult(
+        key = "key",
+        value = value
+    )
 }
 ```
 On the screen to where you return the result, observe the result in this way:
 ```kotlin
 LaunchedEffect(true) {
-	navigationManager.currentBackStackEntry?.collectResult<YourResultType?>(
-		key = "key",
-		initialValue = null
-	) { result ->
-		// process the result
-	}
+    navigationManager.currentBackStackEntry?.collectResult<YourResultType?>(
+	key = "key",
+	initialValue = null
+    ) { result ->
+	// process the result
+    }
 }
 ```
 You can return the result not only to the previous screen, but to any destinnation in back stack.
 ```kotlin
 navigationManager.popBackStack(
-	destination = FooPageDestination,
-	inclusive = false
+    destination = FooPageDestination,
+    inclusive = false
 ) {
-	withResult(
-		key = "key",
-		value = value
-	)
+    withResult(
+	key = "key",
+	value = value
+    )
 }
 ```
 
