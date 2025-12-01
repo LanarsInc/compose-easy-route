@@ -78,6 +78,7 @@ dependencies {
 
     implementation(Dependencies.Hilt.hiltAndroid)
     kapt(Dependencies.Hilt.hiltCompiler)
+    kapt(Dependencies.Hilt.hiltAndroidCompiler)
     implementation(Dependencies.Hilt.navigationCompose)
 
     testImplementation(Dependencies.Test.junit)
