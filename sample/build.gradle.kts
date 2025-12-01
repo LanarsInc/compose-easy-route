@@ -1,16 +1,20 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id(Dependencies.Plugins.androidApplication)
     id(Dependencies.Plugins.kotlinAndroid)
-    id(Dependencies.Plugins.ksp) version Dependencies.Plugins.kspVersion
+    id(Dependencies.Plugins.ksp)
     id(Dependencies.Plugins.kotlinParcelize)
     id(Dependencies.Plugins.kotlinKapt)
     id(Dependencies.Plugins.hiltAndroid)
+    id(Dependencies.Plugins.composeCompilerPlugin)
 }
 
 android {
     compileSdk = Config.compileSdk
 
     defaultConfig {
+        namespace = "com.lanars.compose_easy_route"
         applicationId = "com.lanars.compose_easy_route.sample"
         minSdk = Config.minSdk
         targetSdk = Config.targetSdk
@@ -33,11 +37,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true
@@ -45,7 +46,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = Dependencies.Compose.compilerVersion
     }
-    packagingOptions {
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
@@ -60,12 +61,19 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
+
 dependencies {
     implementation(project(":compose-easy-route"))
     ksp(project(":compose-easy-route-generator"))
 
     implementation(Dependencies.Compose.ui)
     implementation(Dependencies.Compose.material)
+    implementation(Dependencies.Compose.materialIcons)
     implementation(Dependencies.Compose.activityCompose)
     debugImplementation(Dependencies.Compose.preview)
     debugImplementation(Dependencies.Compose.uiTooling)
@@ -76,6 +84,7 @@ dependencies {
 
     implementation(Dependencies.Hilt.hiltAndroid)
     kapt(Dependencies.Hilt.hiltCompiler)
+    kapt(Dependencies.Hilt.hiltAndroidCompiler)
     implementation(Dependencies.Hilt.navigationCompose)
 
     testImplementation(Dependencies.Test.junit)

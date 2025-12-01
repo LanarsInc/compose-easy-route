@@ -1,6 +1,9 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id(Dependencies.Plugins.androidLibrary)
     id(Dependencies.Plugins.kotlinAndroid)
+    id(Dependencies.Plugins.composeCompilerPlugin)
 }
 
 android {
@@ -32,11 +35,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     buildFeatures {
@@ -44,6 +44,12 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion = Dependencies.Compose.compilerVersion
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 

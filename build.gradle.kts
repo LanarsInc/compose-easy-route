@@ -9,6 +9,8 @@ plugins {
     id(Dependencies.Plugins.androidLibrary) version Dependencies.Plugins.androidLibraryVersion apply false
     id(Dependencies.Plugins.kotlinAndroid) version Dependencies.Plugins.kotlinVersion apply false
     id(Dependencies.Plugins.kotlinJvm) version Dependencies.Plugins.kotlinVersion apply false
+    id(Dependencies.Plugins.composeCompilerPlugin) version Dependencies.Plugins.kotlinVersion apply false
+    id(Dependencies.Plugins.ksp) version Dependencies.Plugins.kspVersion apply false
     id(Dependencies.Plugins.mavenPublish)
 }
 
