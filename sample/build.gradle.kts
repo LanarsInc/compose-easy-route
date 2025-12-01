@@ -67,6 +67,7 @@ dependencies {
 
     implementation(Dependencies.Compose.ui)
     implementation(Dependencies.Compose.material)
+    implementation(Dependencies.Compose.materialIcons)
     implementation(Dependencies.Compose.activityCompose)
     debugImplementation(Dependencies.Compose.preview)
     debugImplementation(Dependencies.Compose.uiTooling)
