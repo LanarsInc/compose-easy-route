@@ -50,6 +50,7 @@ fun EasyRouteNavHost(
                             }
                         }
                     }
+
                     is NavigationCommand.PopCommand -> {
                         with(navController) {
                             command.popOptions?.navigationResult?.let {
@@ -58,6 +59,7 @@ fun EasyRouteNavHost(
                             popBackStack()
                         }
                     }
+
                     is NavigationCommand.PopUpToCommand -> {
                         with(navController) {
                             command.popOptions?.navigationResult?.let {
@@ -70,6 +72,7 @@ fun EasyRouteNavHost(
                             )
                         }
                     }
+
                     is NavigationCommand.SetResult<*> -> {
                         val backStackEntry = if (command.destination == null) {
                             navController.previousBackStackEntry
@@ -79,6 +82,7 @@ fun EasyRouteNavHost(
 
                         backStackEntry?.savedStateHandle?.set(command.key, command.value)
                     }
+
                     else -> throw UnsupportedOperationException("Could not handle command $command")
                 }
             }
