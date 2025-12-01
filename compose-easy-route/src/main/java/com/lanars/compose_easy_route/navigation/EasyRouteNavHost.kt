@@ -100,8 +100,12 @@ private fun getNavOptions(
 ): NavOptions {
     val builder = NavOptions.Builder()
     if (options.popUntilRoot) {
+        val previousEntry = navController.previousBackStackEntry
+        val destinationId = previousEntry?.destination?.id
+            ?: navController.graph.startDestinationId
+
         builder.setPopUpTo(
-            navController.backQueue[1].destination.id,
+            destinationId,
             inclusive = options.isPopUpToInclusive(),
             saveState = options.shouldPopUpToSaveState()
         )
