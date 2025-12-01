@@ -1,6 +1,7 @@
 plugins {
     id(Dependencies.Plugins.androidLibrary)
     id(Dependencies.Plugins.kotlinAndroid)
+    id(Dependencies.Plugins.composeCompilerPlugin)
 }
 
 android {

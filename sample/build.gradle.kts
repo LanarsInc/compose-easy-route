@@ -5,6 +5,7 @@ plugins {
     id(Dependencies.Plugins.kotlinParcelize)
     id(Dependencies.Plugins.kotlinKapt)
     id(Dependencies.Plugins.hiltAndroid)
+    id(Dependencies.Plugins.composeCompilerPlugin)
 }
 
 android {
